@@ -11,6 +11,17 @@ export const uploadVideo = async (req, res) => {
   }
 };
 
+export const updateVideo = async (req, res) => {
+  try {
+    const video = await videoService.updateVideoLogic(req.params.id, req.user.id, req.body.description);
+    res.json({ success: true, message: "Cập nhật video thành công.", video });
+  } catch (err) {
+    if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Không tìm thấy." });
+    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Không có quyền." });
+    res.status(500).json({ message: "Lỗi cập nhật.", error: err.message });
+  }
+};
+
 export const getVideoFeed = async (req, res) => {
   try {
     const [trending, random] = await Promise.all([
