@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createQuestion,
+  updateQuestion,
   getAllQuestions,
   getQuestionById,
   hideQuestion,
@@ -16,6 +17,7 @@ import { authenticate } from "../middlewares/authMiddleware.js";
 const router = express.Router();
 
 router.post("/", authenticate, createQuestion);
+router.put("/:id", authenticate, updateQuestion);
 
 // ❗ Đặt các route cụ thể lên TRÊN
 router.get("/search", authenticate, searchQuestions);

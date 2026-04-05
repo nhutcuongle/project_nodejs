@@ -103,5 +103,5 @@ Hãy truy cập đường dẫn mặc định Vite báo chạy thành công thô
 ## 📬 Thông Tin Liên Hệ Chủ Project
 Nếu bạn gặp vấn đề hoặc có các ý tưởng về dự án hay cần giải đáp:
 - **Tác giả:** Nhut Cuong Le
-- **Email/Contact:** (Thay thế địa chỉ E-mail của bạn tại đây)
+- **Email/Contact:** cuong007266@gmail.com
 - **GitHub:** [https://github.com/nhutcuongle](https://github.com/nhutcuongle)

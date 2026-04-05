@@ -207,3 +207,53 @@ export const cleanupQuestionData = async (questionId) => {
     voteService.cleanupVotes(questionId, "question"),
   ]);
 };
+
+/**
+ * Logic for updating a question with moderation checks.
+ */
+export const updateQuestionLogic = async (questionId, data, authorId) => {
+  const { title, content, images, hashtags } = data;
+
+  const question = await Question.findById(questionId);
+  if (!question) throw new Error("NOT_FOUND");
+  if (question.author.toString() !== authorId.toString()) throw new Error("UNAUTHORIZED");
+
+  // Moderation
+  let action = "allow";
+  let finalTitle = question.title;
+  let finalContent = question.content;
+  let hashtagIds = question.hashtags;
+
+  if (title || content) {
+    const textToCheck = (title || question.title) + " " + (content || question.content);
+    const filter = await containsFilteredWord(textToCheck);
+    action = filter.action;
+    
+    if (action === "block") throw new Error("CONTENT_BLOCKED");
+    
+    if (title) finalTitle = action === "censor" ? (await containsFilteredWord(title)).processedText : title;
+    if (content) finalContent = action === "censor" ? (await containsFilteredWord(content)).processedText : content;
+  }
+
+  if (hashtags) {
+    const bannedHashtags = await containsBannedHashtag(hashtags);
+    if (bannedHashtags && action !== "block") action = "pending";
+    hashtagIds = await processHashtags(hashtags);
+  }
+
+  const isApproved = action !== "pending";
+
+  question.title = finalTitle;
+  question.content = finalContent;
+  if (images) question.images = images;
+  if (hashtags) question.hashtags = hashtagIds;
+  question.approved = isApproved;
+
+  await question.save();
+
+  return {
+    status: isApproved ? 200 : 202,
+    question,
+    message: isApproved ? "Cập nhật câu hỏi thành công." : "Cập nhật thành công. Đang chờ kiểm duyệt lại."
+  };
+};

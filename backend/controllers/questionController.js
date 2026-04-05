@@ -22,6 +22,27 @@ export const createQuestion = async (req, res) => {
   }
 };
 
+export const updateQuestion = async (req, res) => {
+  try {
+    if (req.user.permissions?.canAsk === false) {
+      return res.status(403).json({ message: "Tài khoản của bạn đã bị cấm." });
+    }
+
+    const { status, question, message } = await questionService.updateQuestionLogic(
+      req.params.id,
+      req.body,
+      req.user.id
+    );
+
+    res.status(status).json({ message, question });
+  } catch (err) {
+    if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Không tìm thấy." });
+    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Không có quyền." });
+    if (err.message === "CONTENT_BLOCKED") return res.status(403).json({ message: "Nội dung vi phạm chính sách." });
+    res.status(500).json({ message: "Lỗi hệ thống.", error: err.message });
+  }
+};
+
 export const deleteQuestion = async (req, res) => {
   try {
     const question = await Question.findById(req.params.id);
