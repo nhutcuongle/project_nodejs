@@ -1,48 +1,33 @@
-import Video from "../models/Video.js";
+import * as videoRepository from "../repositories/videoRepository.js";
 import Notification from "../models/Notification.js";
 import User from "../models/User.js";
 
 export const createVideo = async (userId, description, filePath) => {
-  return await Video.create({ user: userId, description, videoUrl: filePath });
+  return await videoRepository.create({ user: userId, description, videoUrl: filePath });
 };
 
-export const getTrendingVideos = () =>
-  Video.find({ videoUrl: { $exists: true, $ne: "" } })
-    .sort({ views: -1 })
-    .limit(40)
-    .populate("user", "username avatar identifier")
-    .lean();
+export const getTrendingVideos = (limit = 40) => {
+  return videoRepository.findTrending(limit);
+};
 
-export const getRandomVideos = () =>
-  Video.aggregate([
-    { $match: { videoUrl: { $exists: true, $ne: "" } } },
-    { $sample: { size: 10 } },
-    { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "userObj" } },
-    { $unwind: "$userObj" },
-    {
-      $project: {
-        videoUrl: 1, description: 1, likes: 1, commentsCount: 1, views: 1,
-        user: { 
-          _id: "$userObj._id", username: "$userObj.username", 
-          avatar: "$userObj.avatar", identifier: "$userObj.identifier" 
-        },
-      },
-    },
-  ]);
+export const getRandomVideos = (size = 10) => {
+  return videoRepository.findRandom(size);
+};
 
 export const toggleLikeVideoLogic = async (videoId, userId, io) => {
-  const video = await Video.findById(videoId).populate("user");
+  // Use repository to find the video
+  const video = await videoRepository.findById(videoId, "user");
   if (!video) throw new Error("NOT_FOUND");
 
   const userIdStr = userId.toString();
   const hasLiked = video.likes.some((id) => id.toString() === userIdStr);
-  const liker = await User.findById(userId);
+  const liker = await User.findById(userId); // Still using User model directly for now
 
   if (hasLiked) {
     video.likes.pull(userId);
   } else {
     video.likes.push(userId);
-    // Notification
+    // Notification logic stays in Service Layer (Business Logic)
     if (video.user._id.toString() !== userIdStr) {
       const notif = await Notification.create({
         user: video.user._id,
@@ -60,7 +45,8 @@ export const toggleLikeVideoLogic = async (videoId, userId, io) => {
     }
   }
 
-  await video.save();
+  // Use repository to save the document
+  await videoRepository.save(video);
 
   if (io) {
     io.to(`video_${video._id.toString()}`).emit("updateLikesCount", { likesCount: video.likes.length });
