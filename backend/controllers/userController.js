@@ -2,7 +2,11 @@ import * as userService from "../services/userService.js";
 
 export const updateProfile = async (req, res) => {
   try {
-    const updatedUser = await userService.updateUserProfile(req.user.id, req.body);
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.avatar = req.file.path; // Cloudinary URL
+    }
+    const updatedUser = await userService.updateUserProfile(req.user.id, updateData);
     res.json(updatedUser);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -21,7 +25,7 @@ export const changePassword = async (req, res) => {
 
 export const getCurrentUser = async (req, res) => {
   try {
-    const user = await userService.getUserWithFollowStats(req.user.id);
+    const user = await userService.getUserProfileWithStats(req.user.id, true);
     res.json(user);
   } catch (err) {
     res.status(400).json({ message: err.message });
