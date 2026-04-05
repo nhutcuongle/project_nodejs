@@ -22,6 +22,16 @@ export const updateVideo = async (req, res) => {
   }
 };
 
+export const getVideoById = async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id).populate("user", "username avatar identifier");
+    if (!video) return res.status(404).json({ message: "Không tìm thấy video." });
+    res.json(video);
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi.", error: err.message });
+  }
+};
+
 export const getVideoFeed = async (req, res) => {
   try {
     const [trending, random] = await Promise.all([

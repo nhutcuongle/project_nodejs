@@ -6,9 +6,13 @@ import { getCurrentUser,getPublicUserInfo ,getPublicUserInfoByIdentifier} from "
 
 
 
-const router = express.Router();
+import multer from "multer";
+import { storage } from "../utils/cloudinary.js";
 
-router.put("/update-profile", authenticate, updateProfile);
+const router = express.Router();
+const upload = multer({ storage });
+
+router.put("/update-profile", authenticate, upload.single("avatar"), updateProfile);
 
 
 router.put("/change-password", authenticate, changePassword);
