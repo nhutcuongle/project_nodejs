@@ -66,3 +66,19 @@ export const deleteVideoFromCloudinary = async (url) => {
     console.warn("Không xóa được Cloudinary:", err.message);
   }
 };
+
+/**
+ * Logic for updating a video's details (e.g. description).
+ */
+export const updateVideoLogic = async (videoId, userId, description) => {
+  const video = await Video.findById(videoId);
+  if (!video) throw new Error("NOT_FOUND");
+  if (video.user.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
+
+  if (description !== undefined) {
+    video.description = description;
+  }
+
+  await video.save();
+  return video;
+};
