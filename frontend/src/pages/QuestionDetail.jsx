@@ -160,29 +160,6 @@ const handleReplySubmit = async (e, parentId = null) => {
           downvotes,
           userVote,
         }));
-      } else if (targetType === "answer") {
-        const voteData = { upvotes, downvotes, userVote };
-
-        const updateVoteRecursively = (answers, targetId, voteData) => {
-          return answers.map((ans) => {
-            if (ans._id === targetId) {
-              return { ...ans, ...voteData };
-            } else if (ans.children && ans.children.length > 0) {
-              return {
-                ...ans,
-                children: updateVoteRecursively(
-                  ans.children,
-                  targetId,
-                  voteData
-                ),
-              };
-            } else {
-              return ans;
-            }
-          });
-        };
-
-        setAnswers((prev) => updateVoteRecursively(prev, targetId, voteData));
       }
 
       socket.emit("vote", {
@@ -235,7 +212,6 @@ const handleReplySubmit = async (e, parentId = null) => {
             replyInputs={replyInputs}
             setReplyInputs={setReplyInputs}
             handleReplySubmit={handleReplySubmit}
-            handleVote={handleVote}
           />
 
           {/* Pagination */}

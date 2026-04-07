@@ -51,22 +51,10 @@ export const getQuestionAnswersEnriched = async (questionId, userId) => {
     }
   });
 
-  const enrichAnswerRecursive = async (answer) => {
-    const { upvotes, downvotes } = await voteService.getVoteCounts(answer._id, "answer");
-    const userVote = await voteService.getUserVote(userId, answer._id, "answer");
-    
-    // Process children
-    const rawChildren = childAnswersMap[answer._id.toString()] || [];
-    const children = await Promise.all(rawChildren.map(enrichAnswerRecursive));
-
     return {
       ...answer,
-      upvotes,
-      downvotes,
-      userVote,
       children,
     };
-  };
 
   const parentAnswers = rawAnswers.filter((a) => !a.parentAnswer);
   return Promise.all(parentAnswers.map(enrichAnswerRecursive));
@@ -86,16 +74,8 @@ export const getQuestionAnswersFlatEnriched = async (questionId, userId) => {
 
   const enriched = await Promise.all(
     rawAnswers.map(async (ans) => {
-      const [votes, userVote] = await Promise.all([
-        voteService.getVoteCounts(ans._id, "answer"),
-        voteService.getUserVote(userId, ans._id, "answer")
-      ]);
-      
       return {
         ...ans,
-        upvotes: votes.upvotes,
-        downvotes: votes.downvotes,
-        userVote,
       };
     })
   );

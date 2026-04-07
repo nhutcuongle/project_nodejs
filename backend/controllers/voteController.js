@@ -5,7 +5,7 @@ export const vote = async (req, res) => {
   const userId = req.user._id;
   const username = req.user.username;
 
-  if (!["question", "answer"].includes(targetType) || !["up", "down"].includes(voteType)) {
+  if (!["question"].includes(targetType) || !["up", "down"].includes(voteType)) {
     return res.status(400).json({ message: "Tham số không hợp lệ." });
   }
 

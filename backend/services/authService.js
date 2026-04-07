@@ -46,7 +46,6 @@ export const registerUser = async (data) => {
 export const loginUser = async (email, password) => {
   const user = await User.findOne({ email });
   if (!user) throw new Error("Không tìm thấy người dùng.");
-  if (user.isDisabled) throw new Error("Tài khoản đã bị vô hiệu hóa.");
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error("Mật khẩu sai.");

@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import * as encryptionService from "./encryptionService.js";
 
 // ✅ Kiểm tra follow 2 chiều
-export async function isMutualFollow(userA, userB) {
+export const isMutualFollow = async (userA, userB) => {
   const aId = new mongoose.Types.ObjectId(userA);
   const bId = new mongoose.Types.ObjectId(userB);
 
@@ -14,9 +14,9 @@ export async function isMutualFollow(userA, userB) {
   const followingBA = await Follow.findOne({ follower: bId, following: aId });
 
   return !!(followingAB && followingBA);
-}
+};
 
-export async function createOrSendMessage({ senderId, recipientId, text, io }) {
+export const createOrSendMessage = async ({ senderId, recipientId, text, io }) => {
   const participants = [
     new mongoose.Types.ObjectId(senderId),
     new mongoose.Types.ObjectId(recipientId),
@@ -94,10 +94,10 @@ export async function createOrSendMessage({ senderId, recipientId, text, io }) {
   }
 
   return { conversation: populated, message: rawMsg };
-}
+};
 
 // ✅ Lấy danh sách conversation
-export async function getUserConversations({ userId, box = "main" }) {
+export const getUserConversations = async ({ userId, box = "main" }) => {
   const uid = new mongoose.Types.ObjectId(userId);
 
   let filter = {
@@ -129,14 +129,14 @@ export async function getUserConversations({ userId, box = "main" }) {
   });
 
   return result;
-}
+};
 
 // ✅ Chấp nhận tin nhắn chờ
-export async function acceptConversationRequest({
+export const acceptConversationRequest = async ({
   conversationId,
   userId,
   io,
-}) {
+}) => {
   const convo = await Conversation.findById(conversationId);
   if (!convo || convo.requestedTo.toString() !== userId.toString()) return null;
 
@@ -156,14 +156,14 @@ export async function acceptConversationRequest({
   });
 
   return convo;
-}
+};
 
 // ❌ Từ chối tin nhắn chờ
-export async function rejectConversationRequest({
+export const rejectConversationRequest = async ({
   conversationId,
   userId,
   io,
-}) {
+}) => {
   const convo = await Conversation.findById(conversationId);
   if (!convo || convo.requestedTo.toString() !== userId.toString()) return null;
 
@@ -177,9 +177,9 @@ export async function rejectConversationRequest({
   });
 
   return convo;
-}
+};
 
-export async function deleteConversation({ conversationId, userId }) {
+export const deleteConversation = async ({ conversationId, userId }) => {
   if (!conversationId || !conversationId.match(/^[0-9a-fA-F]{24}$/)) {
     throw new Error("ID conversation không hợp lệ");
   }

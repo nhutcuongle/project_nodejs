@@ -15,7 +15,6 @@ function AnswerItem({
   replyInputs,
   setReplyInputs,
   handleReplySubmit,
-  handleVote,
 }) {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -131,22 +130,6 @@ function AnswerItem({
             {/* Actions Bar */}
             {!isEditing && (
               <div className="flex items-center gap-5 mt-3">
-                {/* Vote Group */}
-                <div className="flex items-center gap-2 bg-gray-100/50 rounded-full px-2 py-0.5">
-                  <button
-                    onClick={() => handleVote(answer._id, "upvote", "answer")}
-                    className={`p-1 transition-colors ${answer.userVote === "up" ? "text-blue-600" : "text-gray-400 hover:text-blue-600"}`}
-                  >
-                    👍 <span className="text-xs font-bold ml-1">{answer.upvotes || 0}</span>
-                  </button>
-                  <div className="w-[1px] h-3 bg-gray-300" />
-                  <button
-                    onClick={() => handleVote(answer._id, "downvote", "answer")}
-                    className={`p-1 transition-colors ${answer.userVote === "down" ? "text-red-500" : "text-gray-400 hover:text-red-500"}`}
-                  >
-                    👎 <span className="text-xs font-bold ml-1">{answer.downvotes || 0}</span>
-                  </button>
-                </div>
 
                 {/* Reply Button */}
                 {user && (

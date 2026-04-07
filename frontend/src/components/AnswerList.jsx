@@ -10,7 +10,6 @@ function AnswerList({
   replyInputs,
   setReplyInputs,
   handleReplySubmit,
-  handleVote,
   depth = 0,
 }) {
   const maxDepth = 2;
@@ -26,7 +25,6 @@ function AnswerList({
             replyInputs={replyInputs}
             setReplyInputs={setReplyInputs}
             handleReplySubmit={handleReplySubmit}
-            handleVote={handleVote}
             depth={depth}
           />
 
@@ -38,8 +36,7 @@ function AnswerList({
                 questionAuthorId={questionAuthorId}
                 replyInputs={replyInputs}
                 setReplyInputs={setReplyInputs}
-                handleReplySubmit={handleReplySubmit}
-                 handleVote={handleVote} 
+                handleReplySubmit={handleReplySubmit} 
                 depth={depth >= maxDepth ? maxDepth : depth + 1} // giới hạn độ sâu hiển thị
               />
             </div>
