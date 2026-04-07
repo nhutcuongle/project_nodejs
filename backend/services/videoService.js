@@ -1,5 +1,4 @@
 import * as videoRepository from "../repositories/videoRepository.js";
-import Notification from "../models/Notification.js";
 import User from "../models/User.js";
 
 export const createVideo = async (userId, description, filePath) => {
@@ -27,22 +26,6 @@ export const toggleLikeVideoLogic = async (videoId, userId, io) => {
     video.likes.pull(userId);
   } else {
     video.likes.push(userId);
-    // Notification logic stays in Service Layer (Business Logic)
-    if (video.user._id.toString() !== userIdStr) {
-      const notif = await Notification.create({
-        user: video.user._id,
-        message: `${liker.identifier} đã thích video của bạn.`,
-        link: `/video/${video._id}`,
-      });
-      if (io) {
-        io.to(video.user._id.toString()).emit("video_liked", {
-          message: notif.message,
-          link: notif.link,
-          createdAt: notif.createdAt,
-          read: false,
-        });
-      }
-    }
   }
 
   // Use repository to save the document

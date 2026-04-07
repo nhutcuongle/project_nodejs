@@ -10,7 +10,6 @@ import {
   BarChart3,
   ClipboardList,
   Users,
-  Tag,
   ChevronLeft,
   ChevronRight,
   Video,
@@ -121,13 +120,7 @@ function Sidebar() {
             collapsed={collapsed}
             currentPath={location.pathname}
           />
-          <SidebarItem
-            to="/admin/hashtags"
-            icon={<Tag size={20} />}
-            label="Quản lý hashtag"
-            collapsed={collapsed}
-            currentPath={location.pathname}
-          />
+
           <SidebarItem
             to="/admin/moderation-logs"
             icon={<ScrollText size={20} />}

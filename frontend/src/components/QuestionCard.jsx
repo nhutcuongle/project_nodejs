@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import HashtagList from "./HashtagList";
 import QuestionMeta from "./QuestionMeta";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-hot-toast";
@@ -82,7 +81,6 @@ function QuestionCard({ question, activeTab, fetchQuestions }) {
         )}
       </p>
 
-      <HashtagList hashtags={question.hashtags} />
 
       <div className="flex items-center mt-3 space-x-4">
         <button

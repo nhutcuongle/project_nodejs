@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import NotificationsDropdown from "./NotificationsDropdown";
 import { Home, Video, MessageCircle, Settings, LogOut, Shield, BarChart3, PlusCircle, MoreVertical } from "lucide-react";
 import { useState } from "react";
 
@@ -88,7 +87,6 @@ function Header() {
                 <div className={`${isVideoPage ? "grid grid-cols-2 gap-2" : "absolute top-full right-0 mt-2 w-48 bg-white border border-gray-100 shadow-xl rounded-xl p-2 animate-in fade-in slide-in-from-top-1"}`}>
                    <Link to="/admin/approve" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Duyệt bài</Link>
                    <Link to="/admin/users" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Thành viên</Link>
-                   <Link to="/admin/hashtags" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Hashtags</Link>
                    <Link to="/admin/stats" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Thống kê</Link>
                 </div>
               )}
@@ -112,7 +110,6 @@ function Header() {
                        <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">{user?.role}</p>
                     </div>
                  </Link>
-                 {!isVideoPage && <NotificationsDropdown />}
               </div>
               
               <button

@@ -18,7 +18,6 @@ import FilteredWords from "../pages/admin/FilteredWords";
 import Statistics from "../pages/admin/Statistics";
 import AdminQuestionList from "../pages/admin/AdminQuestionList";
 import AdminUserList from "../pages/admin/AdminUserList";
-import AdminHashtagManager from "../pages/admin/AdminHashtagManager";
 import ModerationLogs from "../pages/admin/ModerationLogs";
 import SettingsPage from "../pages/SettingsPage";
 import MessagePage from "../pages/MessagePage";
@@ -51,7 +50,6 @@ function AppRouter() {
       <Route path="/admin/stats" element={<Statistics />} />
       <Route path="/admin/questions" element={<AdminQuestionList />} />
       <Route path="/admin/users" element={<AdminUserList />} />
-      <Route path="/admin/hashtags" element={<AdminHashtagManager />} />
       <Route path="/admin/moderation-logs" element={<ModerationLogs />} />
     </Routes>
   );

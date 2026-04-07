@@ -12,7 +12,7 @@ const models = {
  */
 export const getPendingItemsLogic = async () => {
   const [questions, answers] = await Promise.all([
-    Question.find({ approved: false }).populate("author").populate("hashtags", "name").lean(),
+    Question.find({ approved: false }).populate("author").lean(),
     Answer.find({ approved: false }).populate("author").lean()
   ]);
   return { questions, answers };
