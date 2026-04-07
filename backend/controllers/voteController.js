@@ -18,7 +18,6 @@ export const vote = async (req, res) => {
       ...result
     });
   } catch (error) {
-    console.error("❌ [VOTE CONTROLLER] Lỗi khi vote:", error);
     res.status(500).json({ message: "Lỗi máy chủ", error: error.message });
   }
 };

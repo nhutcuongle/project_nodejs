@@ -1,5 +1,4 @@
 import * as replyService from "../services/replyService.js";
-import Reply from "../models/Reply.js";
 import { formatTime } from "../utils/formatTime.js";
 
 export const createReply = async (req, res) => {
@@ -20,10 +19,7 @@ export const createReply = async (req, res) => {
 
 export const getRepliesByComment = async (req, res) => {
   try {
-    const replies = await Reply.find({ comment: req.params.commentId })
-      .populate("user", "username avatar identifier")
-      .populate("replyTo", "username identifier")
-      .sort({ createdAt: 1 });
+    const replies = await replyService.getRepliesByCommentLogic(req.params.commentId);
 
     const formatted = replies.map(r => ({
       ...r.toObject(),

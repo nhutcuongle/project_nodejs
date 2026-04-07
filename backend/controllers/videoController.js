@@ -1,4 +1,3 @@
-import Video from "../models/Video.js";
 import * as videoService from "../services/videoService.js";
 
 export const uploadVideo = async (req, res) => {
@@ -41,14 +40,33 @@ export const likeVideo = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id);
-    if (!video) return res.status(404).json({ message: "Không tìm thấy." });
-    if (video.user.toString() !== req.user.id) return res.status(403).json({ message: "Không có quyền." });
-
-    await videoService.deleteVideoFromCloudinary(video.videoUrl);
-    await video.deleteOne();
-    res.json({ success: true, message: "Đã xóa." });
+    const result = await videoService.deleteVideoLogic(req.params.id, req.user.id);
+    res.json(result);
   } catch (err) {
+    if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Không tìm thấy." });
+    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Không có quyền." });
     res.status(500).json({ message: "Lỗi xóa.", error: err.message });
+  }
+};
+
+export const updateVideo = async (req, res) => {
+  try {
+    const { description } = req.body;
+    const video = await videoService.updateVideoLogic(req.params.id, req.user.id, description);
+    res.json({ success: true, video });
+  } catch (err) {
+    if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Không tìm thấy video." });
+    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Không có quyền sửa video này." });
+    res.status(500).json({ message: "Lỗi cập nhật.", error: err.message });
+  }
+};
+
+export const getVideoById = async (req, res) => {
+  try {
+    const video = await videoService.getVideoByIdLogic(req.params.id);
+    res.json(video);
+  } catch (err) {
+    if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Không tìm thấy video." });
+    res.status(500).json({ message: "Lỗi lấy chi tiết video.", error: err.message });
   }
 };

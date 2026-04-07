@@ -1,12 +1,10 @@
 import * as messageService from "../services/messageService.js";
-import Message from "../models/Message.js";
-import Conversation from "../models/Conversation.js";
+
 
 export const getMessages = async (req, res) => {
   try {
-    const messages = await messageService.getMessagesLogic(req.params.conversationId, req.user.id);
-    const conversation = await Conversation.findById(req.params.conversationId); // For status
-    res.json({ messages, status: conversation?.status });
+    const data = await messageService.getMessagesLogic(req.params.conversationId, req.user.id);
+    res.json(data);
   } catch (err) {
     res.status(err.message === "NOT_FOUND" ? 404 : 500).json({ message: "Lỗi tải tin nhắn." });
   }
@@ -30,17 +28,8 @@ export const sendMessage = async (req, res) => {
 
 export const markAsRead = async (req, res) => {
   try {
-    const { conversationId } = req.params;
-    const userId = req.user.id;
-    await Message.updateMany(
-      { conversation: conversationId, sender: { $ne: userId }, status: { $ne: "read" } },
-      { $set: { status: "read" } }
-    );
-    await Conversation.updateOne(
-      { _id: conversationId, "unreadCounts.user": userId },
-      { $set: { "unreadCounts.$.count": 0 } }
-    );
-    res.json({ message: "Đã đọc." });
+    const result = await messageService.markAsReadLogic(req.params.conversationId, req.user.id);
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: "Lỗi cập nhật." });
   }
@@ -66,13 +55,8 @@ export const editMessage = async (req, res) => {
 
 export const deleteMessageLocal = async (req, res) => {
   try {
-    const message = await Message.findById(req.params.id);
-    if (!message) return res.status(404).json({ message: "Không tìm thấy." });
-    if (!message.deletedFor.includes(req.user.id)) {
-      message.deletedFor.push(req.user.id);
-      await message.save();
-    }
-    res.json({ success: true });
+    const result = await messageService.deleteMessageLocalLogic(req.params.id, req.user.id);
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: "Lỗi xóa." });
   }
@@ -80,18 +64,8 @@ export const deleteMessageLocal = async (req, res) => {
 
 export const togglePinMessage = async (req, res) => {
   try {
-    const message = await Message.findById(req.params.id);
-    if (!message) return res.status(404).json({ message: "Không tìm thấy." });
-    const conversation = await Conversation.findById(message.conversation);
-    if (!conversation.participants.some(p => p.toString() === req.user.id))
-      return res.status(403).json({ message: "Từ chối." });
-
-    message.isPinned = !message.isPinned;
-    await message.save();
-    req.app.get("io").to(message.conversation.toString()).emit("message_pinned", { 
-      messageId: message._id, isPinned: message.isPinned 
-    });
-    res.json({ success: true, message });
+    const result = await messageService.togglePinMessageLogic(req.params.id, req.user.id, req.app.get("io"));
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: "Lỗi ghim." });
   }

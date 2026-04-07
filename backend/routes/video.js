@@ -2,7 +2,7 @@ import express from "express";
 import multer from "multer";
 import { authenticate } from "../middlewares/authMiddleware.js";
 
-import { uploadVideo, getVideoFeed, likeVideo, deleteVideo } from "../controllers/videoController.js";
+import { uploadVideo, getVideoFeed, likeVideo, deleteVideo, updateVideo, getVideoById } from "../controllers/videoController.js";
 import { videoStorage } from "../utils/cloudinary.js";
 
 

@@ -1,5 +1,4 @@
 import * as adminUserService from "../services/adminUserService.js";
-import User from "../models/User.js";
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -23,12 +22,7 @@ export const toggleDisableUser = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    const { id } = req.params;
-    const isAdmin = await adminUserService.isTargetAdmin(id);
-    if (isAdmin) return res.status(403).json({ message: "Không thể xóa Admin." });
-
-    const user = await User.findByIdAndDelete(id);
-    if (!user) return res.status(404).json({ message: "Không tìm thấy." });
+    await adminUserService.deleteUserLogic(req.params.id);
     res.json({ message: "Xóa thành công." });
   } catch (err) {
     res.status(500).json({ message: "Lỗi xóa.", error: err.message });

@@ -67,11 +67,21 @@ export const deleteVideoFromCloudinary = async (url) => {
   }
 };
 
+export const deleteVideoLogic = async (videoId, userId) => {
+  const video = await videoRepository.findById(videoId);
+  if (!video) throw new Error("NOT_FOUND");
+  if (video.user.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
+
+  await deleteVideoFromCloudinary(video.videoUrl);
+  await video.deleteOne();
+  return { success: true, message: "Đã xóa." };
+};
+
 /**
  * Logic for updating a video's details (e.g. description).
  */
 export const updateVideoLogic = async (videoId, userId, description) => {
-  const video = await Video.findById(videoId);
+  const video = await videoRepository.findById(videoId);
   if (!video) throw new Error("NOT_FOUND");
   if (video.user.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
 
@@ -79,6 +89,12 @@ export const updateVideoLogic = async (videoId, userId, description) => {
     video.description = description;
   }
 
-  await video.save();
+  await videoRepository.save(video);
+  return video;
+};
+
+export const getVideoByIdLogic = async (videoId) => {
+  const video = await videoRepository.findById(videoId, "user");
+  if (!video) throw new Error("NOT_FOUND");
   return video;
 };

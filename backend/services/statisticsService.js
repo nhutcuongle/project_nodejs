@@ -22,12 +22,20 @@ export const getSystemStats = async () => {
 /**
  * Gets counts grouped by time period (day, month, year, etc).
  */
-export const getCountsByTime = async (Model, type = "week") => {
+export const getCountsByTime = async (modelName, type = "week") => {
+  const models = { User, Question, Vote };
+  const Model = models[modelName];
+  if (!Model) throw new Error("Invalid model");
+  
   const groupId = getTimeGroup(type);
   return await Model.aggregate([
     { $group: { _id: groupId, count: { $sum: 1 } } },
     { $sort: { _id: 1 } }
   ]);
+};
+
+export const getUserRoleDistributionLogic = async () => {
+  return await User.aggregate([{ $group: { _id: "$role", count: { $sum: 1 } } }]);
 };
 
 /**

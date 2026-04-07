@@ -25,6 +25,14 @@ export const createReplyLogic = async (commentId, userId, text, replyTo, io) => 
   return reply;
 };
 
+export const getRepliesByCommentLogic = async (commentId) => {
+  const replies = await Reply.find({ comment: commentId })
+    .populate("user", "username avatar identifier")
+    .populate("replyTo", "username identifier")
+    .sort({ createdAt: 1 });
+  return replies;
+};
+
 /**
  * Toggles like on a reply.
  */

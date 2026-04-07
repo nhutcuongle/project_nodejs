@@ -1,5 +1,5 @@
 import * as hashtagService from "../services/hashtagService.js";
-import Question from "../models/Question.js";
+
 
 export const getAllHashtags = async (req, res) => {
   try {
@@ -14,9 +14,7 @@ export const updateHashtag = async (req, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
-    await hashtagService.createHashtagLogic(name); // Check name exist
-    // Update logic 
-    const hashtag = await Hashtag.findByIdAndUpdate(id, { name }, { new: true });
+    const hashtag = await hashtagService.updateHashtagLogic(id, { name });
     res.json({ message: "Cập nhật thành công.", hashtag });
   } catch (err) {
     res.status(err.message === "HASHTAG_EXISTS" ? 400 : 500).json({ message: "Lỗi cập nhật." });
@@ -46,10 +44,7 @@ export const searchHashtags = async (req, res) => {
 
 export const getQuestionsByHashtag = async (req, res) => {
   try {
-    const questions = await Question.find({ hashtags: req.params.id })
-      .select("_id title author createdAt")
-      .populate("author", "fullName avatar identifier")
-      .sort({ createdAt: -1 });
+    const questions = await hashtagService.getQuestionsByHashtagLogic(req.params.id);
     res.json(questions);
   } catch (err) {
     res.status(500).json({ message: "Lỗi lấy danh sách bài viết." });

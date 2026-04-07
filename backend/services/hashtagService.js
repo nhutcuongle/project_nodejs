@@ -66,3 +66,28 @@ export const bulkDeleteHashtagsLogic = async (ids) => {
 
   return { deletedCount: result[0].deletedCount };
 };
+
+export const getQuestionsByHashtagLogic = async (hashtagId) => {
+  return await Question.find({ hashtags: hashtagId })
+    .select("_id title author createdAt")
+    .populate("author", "fullName avatar identifier")
+    .sort({ createdAt: -1 });
+};
+
+export const getAllHashtagsLogic = async () => {
+  return await Hashtag.find().sort({ usedCount: -1 });
+};
+
+export const searchHashtagsLogic = async (q) => {
+  return await Hashtag.find({
+    name: { $regex: q, $options: "i" }
+  }).limit(10);
+};
+
+export const updateHashtagLogic = async (id, data) => {
+  if (data.name) {
+    const existing = await Hashtag.findOne({ name: data.name.toLowerCase().trim() });
+    if (existing && existing._id.toString() !== id) throw new Error("HASHTAG_EXISTS");
+  }
+  return await Hashtag.findByIdAndUpdate(id, data, { new: true });
+};

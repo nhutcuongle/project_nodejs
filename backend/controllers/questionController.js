@@ -1,4 +1,3 @@
-import Question from "../models/Question.js";
 import * as questionService from "../services/questionService.js";
 
 export const createQuestion = async (req, res) => {
@@ -45,13 +44,11 @@ export const updateQuestion = async (req, res) => {
 
 export const deleteQuestion = async (req, res) => {
   try {
-    const question = await Question.findById(req.params.id);
-    if (!question) return res.status(404).json({ message: "Không tìm thấy." });
-    if (question.author.toString() !== req.user.id) return res.status(403).json({ message: "Không có quyền." });
-
-    await questionService.cleanupQuestionData(question._id);
+    await questionService.deleteQuestionLogic(req.params.id, req.user.id);
     res.json({ message: "Đã xóa câu hỏi." });
   } catch (err) {
+    if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Không tìm thấy." });
+    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Không có quyền." });
     res.status(500).json({ message: "Lỗi xóa.", error: err.message });
   }
 };
@@ -59,24 +56,9 @@ export const deleteQuestion = async (req, res) => {
 export const getAllQuestions = async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const totalQuestions = await Question.countDocuments({ approved: true, isHidden: false });
-    const questions = await Question.find({ approved: true, isHidden: false })
-      .populate("author", "username avatar identifier")
-      .populate("hashtags", "name")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const questionsWithStats = await questionService.enrichQuestionsData(questions, userId);
-
-    res.json({
-      questions: questionsWithStats,
-      pagination: { totalQuestions, totalPages: Math.ceil(totalQuestions / limit), currentPage: page }
-    });
+    const { page, limit } = req.query;
+    const result = await questionService.getAllQuestionsLogic(parseInt(page) || 1, parseInt(limit) || 10, userId);
+    res.json(result);
   } catch (err) {
     res.status(500).json({ message: "Lỗi lấy dữ liệu", error: err.message });
   }
@@ -95,36 +77,27 @@ export const getQuestionById = async (req, res) => {
 
 export const hideQuestion = async (req, res) => {
   try {
-    const question = await Question.findById(req.params.id);
-    if (!question || question.author.toString() !== req.user.id) return res.status(403).json({ message: "Lỗi quyền." });
-    question.isHidden = true;
-    await question.save();
+    await questionService.toggleHideQuestionLogic(req.params.id, req.user.id, true);
     res.json({ message: "Đã ẩn." });
   } catch (err) {
+    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Lỗi quyền." });
     res.status(500).json({ message: "Lỗi ẩn." });
   }
 };
 
 export const unhideQuestion = async (req, res) => {
   try {
-    const question = await Question.findById(req.params.id);
-    if (!question || question.author.toString() !== req.user.id) return res.status(403).json({ message: "Lỗi quyền." });
-    question.isHidden = false;
-    await question.save();
+    await questionService.toggleHideQuestionLogic(req.params.id, req.user.id, false);
     res.json({ message: "Đã hiện." });
   } catch (err) {
+    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Lỗi quyền." });
     res.status(500).json({ message: "Lỗi hiện." });
   }
 };
 
 export const getMyQuestions = async (req, res) => {
   try {
-    const questions = await Question.find({ author: req.user.id, approved: true, isHidden: false })
-      .populate("author", "username avatar identifier")
-      .populate("hashtags", "name")
-      .sort({ createdAt: -1 });
-
-    const enriched = await questionService.enrichQuestionsData(questions, req.user.id);
+    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.user.id, approved: true, isHidden: false }, req.user.id);
     res.json(enriched);
   } catch (err) {
      res.status(500).json({ message: "Lỗi server" });
@@ -133,12 +106,7 @@ export const getMyQuestions = async (req, res) => {
 
 export const getHiddenQuestions = async (req, res) => {
   try {
-    const questions = await Question.find({ author: req.user.id, isHidden: true })
-      .populate("author", "username avatar identifier")
-      .populate("hashtags", "name")
-      .sort({ createdAt: -1 });
-
-    const enriched = await questionService.enrichQuestionsData(questions, req.user.id);
+    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.user.id, isHidden: true }, req.user.id);
     res.json(enriched);
   } catch (err) {
     res.status(500).json({ message: "Lỗi server" });
@@ -157,12 +125,7 @@ export const searchQuestions = async (req, res) => {
 
 export const getQuestionsByUser = async (req, res) => {
   try {
-    const questions = await Question.find({ author: req.params.userId, approved: true, isHidden: false })
-      .populate("author", "username avatar identifier")
-      .populate("hashtags", "name")
-      .sort({ createdAt: -1 });
-
-    const enriched = await questionService.enrichQuestionsData(questions, req.user?.id);
+    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.params.userId, approved: true, isHidden: false }, req.user?.id);
     res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error: error.message });

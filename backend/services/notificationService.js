@@ -97,3 +97,32 @@ export const sendGenericNotification = async (userId, message, link) => {
     console.error("❌ [NOTIFICATION] Lỗi khi gửi thông báo chung:", error);
   }
 };
+
+export const sendGlobalNotificationLogic = async (message, link, io) => {
+  const users = await User.find({}, "_id");
+  const notiList = users.map(user => ({
+    user: user._id,
+    message,
+    link
+  }));
+
+  await Notification.insertMany(notiList);
+
+  users.forEach(user => {
+    io.to(user._id.toString()).emit("global_notification", { message, link });
+  });
+
+  return { message: "Đã gửi thông báo đến toàn bộ người dùng." };
+};
+
+export const getUserNotificationsLogic = async (userId) => {
+  return await Notification.find({ user: userId }).sort({ createdAt: -1 });
+};
+
+export const markAllAsReadLogic = async (userId) => {
+  await Notification.updateMany(
+    { user: userId, read: false },
+    { $set: { read: true } }
+  );
+  return { message: "Đã đánh dấu tất cả thông báo là đã đọc." };
+};

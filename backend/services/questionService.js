@@ -257,3 +257,68 @@ export const updateQuestionLogic = async (questionId, data, authorId) => {
     message: isApproved ? "Cập nhật câu hỏi thành công." : "Cập nhật thành công. Đang chờ kiểm duyệt lại."
   };
 };
+
+export const getAllQuestionsAdminLogic = async () => {
+  return await Question.find()
+    .populate("author", "username")
+    .populate("hashtags", "name")
+    .sort({ createdAt: -1 });
+};
+
+export const updateQuestionAdminLogic = async (id, updates) => {
+  const updated = await Question.findByIdAndUpdate(id, updates, { new: true });
+  if (!updated) throw new Error("NOT_FOUND");
+  return updated;
+};
+
+export const deleteQuestionAdminLogic = async (id) => {
+  const question = await Question.findById(id);
+  if (!question) throw new Error("NOT_FOUND");
+  await cleanupQuestionData(id);
+};
+
+export const deleteQuestionLogic = async (questionId, userId) => {
+  const question = await Question.findById(questionId);
+  if (!question) throw new Error("NOT_FOUND");
+  if (question.author.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
+  await cleanupQuestionData(questionId);
+};
+
+export const getAllQuestionsLogic = async (page, limit, userId) => {
+  const skip = (page - 1) * limit;
+  const filter = { approved: true, isHidden: false };
+
+  const [totalQuestions, questions] = await Promise.all([
+    Question.countDocuments(filter),
+    Question.find(filter)
+      .populate("author", "username avatar identifier")
+      .populate("hashtags", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+  ]);
+
+  const questionsWithStats = await enrichQuestionsData(questions, userId);
+
+  return {
+    questions: questionsWithStats,
+    pagination: { totalQuestions, totalPages: Math.ceil(totalQuestions / limit), currentPage: page }
+  };
+};
+
+export const toggleHideQuestionLogic = async (questionId, userId, isHidden) => {
+  const question = await Question.findById(questionId);
+  if (!question || question.author.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
+  question.isHidden = isHidden;
+  await question.save();
+  return question;
+};
+
+export const getQuestionsByFilterLogic = async (filter, userId) => {
+  const questions = await Question.find(filter)
+    .populate("author", "username avatar identifier")
+    .populate("hashtags", "name")
+    .sort({ createdAt: -1 });
+
+  return await enrichQuestionsData(questions, userId);
+};

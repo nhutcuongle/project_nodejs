@@ -17,10 +17,13 @@ export const getMessagesLogic = async (conversationId, userId) => {
     .sort({ createdAt: 1 })
     .lean();
 
-  return messages.map(m => ({
-    ...m,
-    text: encryptionService.decryptMessage(m.text)
-  }));
+  return {
+    messages: messages.map(m => ({
+      ...m,
+      text: encryptionService.decryptMessage(m.text)
+    })),
+    status: conversation.status
+  };
 };
 
 /**
@@ -107,4 +110,43 @@ export const editMessageLogic = async (messageId, userId, text, io) => {
   const result = message.toObject();
   result.text = text;
   return result;
+};
+
+export const markAsReadLogic = async (conversationId, userId) => {
+  await Message.updateMany(
+    { conversation: conversationId, sender: { $ne: userId }, status: { $ne: "read" } },
+    { $set: { status: "read" } }
+  );
+  await Conversation.updateOne(
+    { _id: conversationId, "unreadCounts.user": userId },
+    { $set: { "unreadCounts.$.count": 0 } }
+  );
+  return { message: "Đã đọc." };
+};
+
+export const deleteMessageLocalLogic = async (messageId, userId) => {
+  const message = await Message.findById(messageId);
+  if (!message) throw new Error("NOT_FOUND");
+  if (!message.deletedFor.includes(userId)) {
+    message.deletedFor.push(userId);
+    await message.save();
+  }
+  return { success: true };
+};
+
+export const togglePinMessageLogic = async (messageId, userId, io) => {
+  const message = await Message.findById(messageId);
+  if (!message) throw new Error("NOT_FOUND");
+  const conversation = await Conversation.findById(message.conversation);
+  if (!conversation.participants.some(p => p.toString() === userId))
+    throw new Error("UNAUTHORIZED");
+
+  message.isPinned = !message.isPinned;
+  await message.save();
+  if (io) {
+    io.to(message.conversation.toString()).emit("message_pinned", { 
+      messageId: message._id, isPinned: message.isPinned 
+    });
+  }
+  return { success: true, message };
 };

@@ -1,9 +1,8 @@
 import * as hashtagService from "../services/hashtagService.js";
-import Hashtag from "../models/Hashtag.js";
 
 export const getAllHashtags = async (req, res) => {
   try {
-    const hashtags = await Hashtag.find().sort({ usedCount: -1 });
+    const hashtags = await hashtagService.getAllHashtagsLogic();
     res.json(hashtags);
   } catch {
     res.status(500).json({ message: "Lỗi khi lấy hashtag" });
@@ -13,9 +12,7 @@ export const getAllHashtags = async (req, res) => {
 export const searchHashtags = async (req, res) => {
   try {
     const q = req.query.q || "";
-    const hashtags = await Hashtag.find({
-      name: { $regex: q, $options: "i" }
-    }).limit(10);
+    const hashtags = await hashtagService.searchHashtagsLogic(q);
     res.json(hashtags);
   } catch {
     res.status(500).json({ message: "Lỗi tìm kiếm." });
@@ -33,7 +30,7 @@ export const createHashtag = async (req, res) => {
 
 export const updateHashtag = async (req, res) => {
   try {
-    const updated = await Hashtag.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updated = await hashtagService.updateHashtagLogic(req.params.id, req.body);
     res.json(updated);
   } catch {
     res.status(500).json({ message: "Lỗi cập nhật." });

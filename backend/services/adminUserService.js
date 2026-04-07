@@ -73,3 +73,11 @@ export const togglePermissionLogic = async (userId, permKey) => {
   await user.save();
   return user;
 };
+
+export const deleteUserLogic = async (userId) => {
+  const isAdmin = await isTargetAdmin(userId);
+  if (isAdmin) throw new Error("CANNOT_MODIFY_ADMIN");
+
+  const user = await User.findByIdAndDelete(userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
+};
