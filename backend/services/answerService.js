@@ -1,6 +1,5 @@
 import Answer from "../models/Answer.js";
 import * as voteService from "./voteService.js";
-import * as notificationService from "./notificationService.js";
 import Question from "../models/Question.js";
 
 /**
@@ -127,25 +126,6 @@ export const createAnswerLogic = async (data, author, io) => {
   );
 
   const question = await Question.findById(questionId).populate("author");
-  
-  // Notifications logic
-  if (isApproved) {
-    if (!parentAnswerId) {
-      const message = `Câu hỏi "${question.title}" đã có câu trả lời mới.`;
-      const link = `/questions/${question._id}`;
-      await notificationService.notifyNewAnswer(question.author._id, message, link, io);
-    } else {
-      const parent = await Answer.findById(parentAnswerId).populate("author");
-      if (parent && parent.author && parent.author._id.toString() !== author.id.toString()) {
-        const message = `Phản hồi mới cho câu trả lời của bạn trong câu hỏi "${question.title}".`;
-        const link = `/questions/${question._id}`;
-        await notificationService.notifyNewAnswer(parent.author._id, message, link, io, {
-          sender: { _id: author.id, username: author.username },
-          type: "reply"
-        });
-      }
-    }
-  }
 
   // Socket emit
   if (io) {

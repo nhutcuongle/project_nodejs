@@ -24,7 +24,6 @@ const SearchBar = () => {
       >
         <option value="title">Tiêu đề</option>
         <option value="content">Nội dung</option>
-        <option value="hashtag">Hashtag</option>
         <option value="user">User ID / Username</option>
       </select>
 

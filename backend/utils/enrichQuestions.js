@@ -1,7 +1,6 @@
 // utils/enrichQuestions.js
 import Answer from "../models/Answer.js";
 import Vote from "../models/Vote.js";
-import Bookmark from "../models/Bookmark.js";
 
 export const enrichQuestions = async (questions, userId) => {
   return Promise.all(
@@ -16,12 +15,8 @@ export const enrichQuestions = async (questions, userId) => {
       let savedByUser = false;
 
       if (userId) {
-        const [vote, saved] = await Promise.all([
-          Vote.findOne({ targetType: "question", targetId: q._id, user: userId }),
-          Bookmark.findOne({ targetId: q._id, targetType: "Question", user: userId }),
-        ]);
+        const vote = await Vote.findOne({ targetType: "question", targetId: q._id, user: userId });
         userVote = vote?.voteType || null;
-        savedByUser = !!saved;
       }
 
       return {
@@ -30,7 +25,6 @@ export const enrichQuestions = async (questions, userId) => {
         upvotes,
         downvotes,
         userVote,
-        savedByUser,
       };
     })
   );

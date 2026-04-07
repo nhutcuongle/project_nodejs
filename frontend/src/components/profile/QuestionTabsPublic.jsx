@@ -8,17 +8,11 @@ const QuestionTabsPublic = ({ userId }) => {
   const [questions, setQuestions] = useState([]);
 
   const fetchUserQuestions = () => axiosClient.get(`/questions/user/${userId}`);
-  const fetchSavedQuestions = () =>
-    axiosClient.get(`/bookmarks/user/${userId}?type=Question`);
 
   const fetchQuestions = async () => {
     try {
       let res;
-      if (activeTab === "saved") {
-        res = await fetchSavedQuestions();
-      } else {
-        res = await fetchUserQuestions();
-      }
+      res = await fetchUserQuestions();
 
       setQuestions(res.data);
     } catch (err) {
@@ -42,16 +36,6 @@ const QuestionTabsPublic = ({ userId }) => {
           onClick={() => setActiveTab("my")}
         >
           Câu hỏi đã đăng
-        </button>
-        <button
-          className={`px-4 py-2 ${
-            activeTab === "saved"
-              ? "border-b-2 border-blue-500 font-semibold"
-              : "text-gray-500"
-          }`}
-          onClick={() => setActiveTab("saved")}
-        >
-          Câu hỏi đã lưu
         </button>
       </div>
 

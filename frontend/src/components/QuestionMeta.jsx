@@ -1,6 +1,4 @@
 import {
-  BsBookmark,
-  BsBookmarkFill,
   BsEye,
   BsEyeSlash,
   BsTrash,
@@ -13,34 +11,8 @@ import { useState } from "react";
 
 function QuestionMeta({ question, activeTab, fetchQuestions }) {
   const { user, token } = useAuth();
-  const [isSaved, setIsSaved] = useState(question.savedByUser);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false); // 👈 Modal state
 
-  const toggleSave = async () => {
-    try {
-      const url = isSaved ? "unsave" : "save";
-      const res = await fetch(
-        `http://localhost:5000/api/bookmarks/${url}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ targetId: question._id, targetType: "Question" }),
-        }
-      );
-
-      if (!res.ok) throw new Error();
-      toast.success(isSaved ? "Đã bỏ lưu" : "Đã lưu câu hỏi", {
-        position: "top-center",
-      });
-      setIsSaved(!isSaved);
-      fetchQuestions?.();
-    } catch {
-      toast.error("Lỗi khi cập nhật lưu", { position: "top-center" });
-    }
-  };
 
   const toggleHide = async () => {
     try {
@@ -110,17 +82,6 @@ function QuestionMeta({ question, activeTab, fetchQuestions }) {
 
         {token && (
           <div className="ml-auto flex items-center gap-2">
-            <button
-              onClick={toggleSave}
-              className="p-1 hover:bg-gray-100 rounded-full group"
-              title={isSaved ? "Bỏ lưu" : "Lưu câu hỏi"}
-            >
-              {isSaved ? (
-                <BsBookmarkFill className="text-yellow-500" />
-              ) : (
-                <BsBookmark className="text-gray-500 group-hover:text-gray-700" />
-              )}
-            </button>
 
             {question.author?._id === user?._id && (
               <>

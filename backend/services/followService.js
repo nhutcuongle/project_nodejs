@@ -1,6 +1,5 @@
 import Follow from "../models/Follow.js";
 import User from "../models/User.js";
-import * as notificationService from "./notificationService.js";
 
 /**
  * Follow a user and send notification.
@@ -36,12 +35,6 @@ export const followUser = async (followerId, followingId, io) => {
     });
   }
 
-  await notificationService.sendGenericNotification(
-    followingId,
-    msg,
-    `/profile/${follower._id}`
-  );
-
   return true;
 };
 
@@ -64,13 +57,6 @@ export const unfollowUser = async (followerId, followingId, io) => {
       type: "unfollow",
     });
   }
-
-  const msg = `${follower.username} đã hủy theo dõi bạn`;
-  await notificationService.sendGenericNotification(
-    followingId,
-    msg,
-    `/profile/${follower._id}`
-  );
 
   return true;
 };

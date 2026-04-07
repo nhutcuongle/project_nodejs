@@ -71,18 +71,12 @@ function AdminQuestionList() {
               <th className="px-4 py-3">Người đăng</th>
               <th className="px-4 py-3">Tiêu đề</th>
               <th className="px-4 py-3">Nội dung</th>
-              <th className="px-4 py-3">Hashtag</th>
               <th className="px-4 py-3">Trạng thái</th>
               <th className="px-4 py-3">Hành động</th>
             </tr>
           </thead>
           <tbody>
             {questions.map((q, index) => {
-              const isExpanded = expandedQuestionIds.includes(q._id);
-              const visibleHashtags = isExpanded
-                ? q.hashtags
-                : q.hashtags?.slice(0, 4);
-
               return (
                 <tr
                   key={q._id}
@@ -97,27 +91,6 @@ function AdminQuestionList() {
                     {q.title || "Không có tiêu đề"}
                   </td>
                   <td className="px-4 py-3 line-clamp-2">{q.content}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1 items-center">
-                      {visibleHashtags?.map((tag) => (
-                        <span
-                          key={tag._id}
-                          className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full text-xs"
-                        >
-                          {tag.name}
-                        </span>
-                      ))}
-
-                      {q.hashtags?.length > 4 && (
-                        <button
-                          onClick={() => toggleExpand(q._id)}
-                          className="text-xs text-blue-500 underline ml-1"
-                        >
-                          {isExpanded ? "Ẩn bớt" : "..."}
-                        </button>
-                      )}
-                    </div>
-                  </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
