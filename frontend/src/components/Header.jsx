@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import NotificationsDropdown from "./NotificationsDropdown";
-import { Home, Video, MessageCircle, Settings, LogOut, Shield, BarChart3, PlusCircle, MoreVertical } from "lucide-react";
+import { Home, Video, MessageCircle, Settings, LogOut, Shield, PlusCircle, MoreVertical, Ban } from "lucide-react";
 import { useState } from "react";
 
 function Header() {
@@ -87,9 +86,9 @@ function Header() {
               {(showAdminMenu || isVideoPage) && (
                 <div className={`${isVideoPage ? "grid grid-cols-2 gap-2" : "absolute top-full right-0 mt-2 w-48 bg-white border border-gray-100 shadow-xl rounded-xl p-2 animate-in fade-in slide-in-from-top-1"}`}>
                    <Link to="/admin/approve" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Duyệt bài</Link>
+                   <Link to="/admin/questions" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Quản lý câu hỏi</Link>
+                   <Link to="/admin/words" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Từ cấm</Link>
                    <Link to="/admin/users" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Thành viên</Link>
-                   <Link to="/admin/hashtags" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Hashtags</Link>
-                   <Link to="/admin/stats" className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg text-xs text-gray-700" onClick={() => setShowAdminMenu(false)}>Thống kê</Link>
                 </div>
               )}
              </div>
@@ -112,7 +111,6 @@ function Header() {
                        <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wider">{user?.role}</p>
                     </div>
                  </Link>
-                 {!isVideoPage && <NotificationsDropdown />}
               </div>
               
               <button
@@ -124,9 +122,9 @@ function Header() {
               </button>
             </div>
           ) : (
-            <div className="flex flex-col gap-2 w-full">
-              <Link to="/login" className="text-center py-2 text-sm font-medium text-gray-600">Đăng nhập</Link>
-              <Link to="/register" className="text-center py-3 bg-blue-600 text-white rounded-xl text-sm font-bold">Đăng ký</Link>
+            <div className={`${isVideoPage ? "flex flex-col gap-2 w-full" : "flex items-center gap-4"}`}>
+              <Link to="/login" className={`text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors ${isVideoPage ? "py-2 text-center" : "px-2"}`}>Đăng nhập</Link>
+              <Link to="/register" className={`bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-md active:scale-95 ${isVideoPage ? "py-3 text-center w-full" : "px-5 py-2.5"}`}>Đăng ký</Link>
             </div>
           )}
         </div>

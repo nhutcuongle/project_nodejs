@@ -1,118 +1,3 @@
-// import { useEffect, useState } from "react";
-// import axios from "../../utils/api";
-// import { useAuth } from "../../context/AuthContext";
-
-// const FilteredWords = () => {
-//   const { token } = useAuth();
-//   const [words, setWords] = useState([]);
-//   const [newWord, setNewWord] = useState("");
-
-//   const fetchWords = async () => {
-//     try {
-//       const res = await axios.get("/filtered-words", {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       setWords(res.data);
-//     } catch (err) {
-//       console.error("Lỗi tải danh sách từ cấm:", err);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchWords();
-//   }, []);
-
-//   const handleAdd = async () => {
-//     if (!newWord.trim()) return;
-//     try {
-//       const res = await axios.post(
-//         "/filtered-words",
-//         { word: newWord },
-//         { headers: { Authorization: `Bearer ${token}` } }
-//       );
-//       setWords([...words, res.data.word]);
-//       setNewWord("");
-//     } catch (err) {
-//       console.error("Lỗi thêm từ:", err);
-//     }
-//   };
-
-//   const handleDelete = async (id) => {
-//     try {
-//       await axios.delete(`/filtered-words/${id}`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-//       setWords(words.filter((w) => w._id !== id));
-//     } catch (err) {
-//       console.error("Lỗi xoá từ:", err);
-//     }
-//   };
-
-//   return (
-//     <div className="p-6 max-w-4xl mx-auto">
-//       <h1 className="text-3xl font-bold mb-6 text-gray-800">🧼 Quản lý Từ Cấm</h1>
-
-//       <div className="flex gap-3 mb-6">
-//         <input
-//           type="text"
-//           placeholder="Nhập từ cấm mới..."
-//           value={newWord}
-//           onChange={(e) => setNewWord(e.target.value)}
-//           className="flex-1 border rounded-md px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-//         />
-//         <button
-//           onClick={handleAdd}
-//           className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition duration-200"
-//         >
-//           ➕ Thêm
-//         </button>
-//       </div>
-
-//       <div className="overflow-x-auto bg-white rounded-xl shadow">
-//         <table className="min-w-full table-auto text-sm text-left text-gray-700">
-//           <thead className="bg-gradient-to-r from-rose-100 to-pink-100 text-gray-700">
-//             <tr>
-//               <th className="px-4 py-3">🚫 Từ cấm</th>
-//               <th className="px-4 py-3">⚙️ Hành động</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {words.map((w, index) => (
-//               <tr
-//                 key={w._id}
-//                 className={`transition duration-200 ${
-//                   index % 2 === 0 ? "bg-white" : "bg-gray-50"
-//                 } hover:bg-red-50`}
-//               >
-//                 <td className="px-4 py-3 font-medium">{w.word}</td>
-//                 <td className="px-4 py-3">
-//                   <button
-//                     onClick={() => handleDelete(w._id)}
-//                     className="px-3 py-1 rounded-md text-white text-sm bg-red-500 hover:bg-red-600 transition duration-200 shadow-sm"
-//                   >
-//                     Xoá
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//             {words.length === 0 && (
-//               <tr>
-//                 <td colSpan="2" className="px-4 py-6 text-center text-gray-500">
-//                   Chưa có từ cấm nào.
-//                 </td>
-//               </tr>
-//             )}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default FilteredWords;
-
-
-// ✅ Quản lý từ cấm: text & hashtag riêng biệt
 import { useEffect, useState } from "react";
 import axios from "../../utils/api";
 import { useAuth } from "../../context/AuthContext";
@@ -120,11 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 const FilteredWords = () => {
   const { token } = useAuth();
   const [textWords, setTextWords] = useState([]);
-  const [hashtagWords, setHashtagWords] = useState([]);
   const [newTextWord, setNewTextWord] = useState("");
-  const [newHashtag, setNewHashtag] = useState("");
-  const [severity, setSeverity] = useState("medium");
-  const [category, setCategory] = useState("general");
   const [action, setAction] = useState("pending");
 
   const fetchWords = async () => {
@@ -132,8 +13,8 @@ const FilteredWords = () => {
       const res = await axios.get("/filtered-words", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // Lọc bỏ hashtag (nếu còn sót từ DB) vì ta không dùng nữa
       setTextWords(res.data.filter((w) => w.type !== "hashtag"));
-      setHashtagWords(res.data.filter((w) => w.type === "hashtag"));
     } catch (err) {
       console.error("Lỗi tải danh sách từ cấm:", err);
     }
@@ -143,88 +24,80 @@ const FilteredWords = () => {
     fetchWords();
   }, []);
 
-  const handleAdd = async (type) => {
-    const word = type === "hashtag" ? newHashtag : newTextWord;
-    if (!word.trim()) return;
+  const handleAdd = async () => {
+    if (!newTextWord.trim()) return;
     try {
-      const payload = { word, type, severity, category, action };
-      const res = await axios.post(
-        "/filtered-words",
-        payload,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      if (type === "hashtag") {
-        setHashtagWords([...hashtagWords, res.data.word]);
-        setNewHashtag("");
-      } else {
-        setTextWords([...textWords, res.data.word]);
-        setNewTextWord("");
-      }
+      const payload = { 
+        word: newTextWord, 
+        type: "text", 
+        action 
+      };
+      
+      const res = await axios.post("/filtered-words", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      // Thông thường backend trả về { word: { ... } } hoặc trực tiếp { ... }
+      const addedWord = res.data.word || res.data;
+      setTextWords((prev) => [...prev, addedWord]);
+      setNewTextWord("");
     } catch (err) {
       console.error("Lỗi thêm từ:", err);
     }
   };
 
-  const handleDelete = async (id, type) => {
+  const handleDelete = async (id) => {
     try {
       await axios.delete(`/filtered-words/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (type === "hashtag") {
-        setHashtagWords(hashtagWords.filter((w) => w._id !== id));
-      } else {
-        setTextWords(textWords.filter((w) => w._id !== id));
-      }
+      setTextWords((prev) => prev.filter((w) => w._id !== id));
     } catch (err) {
       console.error("Lỗi xoá từ:", err);
     }
   };
 
-  const renderTable = (words, title, type, inputVal, setInputVal) => (
+  const renderTable = (words, title, inputVal, setInputVal) => (
     <div className="mt-10">
       <h2 className="text-2xl font-semibold mb-4 text-gray-800">{title}</h2>
 
-      <div className="flex flex-wrap gap-3 mb-6">
+      {/* Form thêm từ mới */}
+      <div className="flex flex-wrap gap-3 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <input
           type="text"
-          placeholder={`Nhập ${type === "hashtag" ? "hashtag" : "từ cấm"} mới...`}
+          placeholder="Nhập từ cấm mới..."
           value={inputVal}
           onChange={(e) => setInputVal(e.target.value)}
-          className="flex-1 border rounded-md px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
+          className="flex-1 min-w-[200px] border rounded-md px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
         />
-        <select value={severity} onChange={(e) => setSeverity(e.target.value)} className="border rounded-md px-3 py-2">
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
-          <option value="critical">Critical</option>
-        </select>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="border rounded-md px-3 py-2">
-          <option value="general">Khác</option>
-          <option value="spam">Spam</option>
-          <option value="hate_speech">Chửi bới / Thù ghét</option>
-          <option value="politics">Chính trị</option>
-        </select>
-        <select value={action} onChange={(e) => setAction(e.target.value)} className="border rounded-md px-3 py-2">
-          <option value="pending">Chờ Duyệt (Pending)</option>
-          <option value="censor">Che tên (Censor ***)</option>
-          <option value="block">Chặn đứng (Block)</option>
-        </select>
+        
+        <div className="flex gap-2">
 
-        <button
-          onClick={() => handleAdd(type)}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition duration-200 min-w-max"
-        >
-          ➕ Thêm
-        </button>
+          <select 
+            value={action} 
+            onChange={(e) => setAction(e.target.value)} 
+            className="border rounded-md px-3 py-2 text-sm"
+          >
+            <option value="pending">Chờ Duyệt</option>
+            <option value="censor">Che tên (***)</option>
+            <option value="block">Chặn đứng</option>
+          </select>
+
+          <button
+            onClick={handleAdd}
+            className="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700 transition duration-200 font-bold"
+          >
+            ➕ Thêm
+          </button>
+        </div>
       </div>
 
       <div className="overflow-x-auto bg-white rounded-xl shadow">
         <table className="min-w-full table-auto text-sm text-left text-gray-700">
           <thead className="bg-gradient-to-r from-indigo-100 to-blue-100 text-gray-700">
             <tr>
-              <th className="px-4 py-3">🚫 {type === "hashtag" ? "Hashtag cấm" : "Từ cấm"}</th>
-              <th className="px-4 py-3">Mức độ</th>
-              <th className="px-4 py-3">Phân loại</th>
+              <th className="px-4 py-3">🚫 Từ cấm</th>
               <th className="px-4 py-3">Xử lý</th>
               <th className="px-4 py-3 text-center">Lượt chặn</th>
               <th className="px-4 py-3">⚙️ Hành động</th>
@@ -239,10 +112,8 @@ const FilteredWords = () => {
                 } hover:bg-red-50`}
               >
                 <td className="px-4 py-3 font-medium">{w.word}</td>
-                <td className="px-4 py-3">{w.severity}</td>
-                <td className="px-4 py-3">{w.category}</td>
                 <td className="px-4 py-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
                     w.action === "block" ? "bg-red-100 text-red-700" :
                     w.action === "censor" ? "bg-yellow-100 text-yellow-700" :
                     "bg-blue-100 text-blue-700"
@@ -253,8 +124,8 @@ const FilteredWords = () => {
                 <td className="px-4 py-3 text-center font-bold text-gray-500">{w.hitCount || 0}</td>
                 <td className="px-4 py-3">
                   <button
-                    onClick={() => handleDelete(w._id, type)}
-                    className="px-3 py-1 rounded-md text-white text-sm bg-red-500 hover:bg-red-600 transition duration-200 shadow-sm"
+                    onClick={() => handleDelete(w._id)}
+                    className="px-3 py-1 rounded-md text-white text-xs bg-red-500 hover:bg-red-600 transition duration-200"
                   >
                     Xoá
                   </button>
@@ -263,8 +134,8 @@ const FilteredWords = () => {
             ))}
             {words.length === 0 && (
               <tr>
-                <td colSpan="6" className="px-4 py-6 text-center text-gray-500">
-                  Chưa có {type === "hashtag" ? "hashtag cấm" : "từ cấm"} nào.
+                <td colSpan="4" className="px-4 py-6 text-center text-gray-500">
+                  Chưa có từ cấm nào.
                 </td>
               </tr>
             )}
@@ -275,10 +146,18 @@ const FilteredWords = () => {
   );
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">🧼 Quản lý Từ Cấm</h1>
-      {renderTable(textWords, "Từ cấm nội dung", "text", newTextWord, setNewTextWord)}
-      {renderTable(hashtagWords, "Hashtag bị cấm", "hashtag", newHashtag, setNewHashtag)}
+    <div className="p-6 max-w-5xl mx-auto min-h-screen bg-gray-50/50">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="p-3 bg-red-100 text-red-600 rounded-2xl">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Quản lý Từ Cấm</h1>
+          <p className="text-gray-500 text-sm">Thiết lập các từ ngữ bị hạn chế để bảo vệ cộng đồng</p>
+        </div>
+      </div>
+
+      {renderTable(textWords, "Danh sách từ hạn chế", newTextWord, setNewTextWord)}
     </div>
   );
 };

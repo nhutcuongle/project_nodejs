@@ -56,15 +56,6 @@ const messageService = {
       console.error("deleteMessageLocal error:", err);
     }
   },
-  async togglePin(messageId) {
-    try {
-      const res = await api.put(`/messages/${messageId}/pin`);
-      return res.data; // ⭐ BẮT BUỘC
-    } catch (err) {
-      console.error("togglePin error:", err);
-      return null;
-    }
-  },
 };
 
 export default messageService;

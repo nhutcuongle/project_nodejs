@@ -33,7 +33,7 @@ export const unfollowUser = async (req, res) => {
 export const getFollowStatus = async (req, res) => {
   try {
     const result = await followService.getFullFollowStatus(req.user._id, req.params.userId);
-    res.json(result); // Tra vè { status, isFollowing, isFollowedByTarget }
+    res.json(result); 
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

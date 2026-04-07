@@ -4,11 +4,7 @@ import {
   updateQuestion,
   getAllQuestions,
   getQuestionById,
-  hideQuestion,
-  unhideQuestion,
   getMyQuestions,
-  getHiddenQuestions,
-  searchQuestions,
   getQuestionsByUser,
   deleteQuestion
 } from "../controllers/questionController.js";
@@ -20,9 +16,7 @@ router.post("/", authenticate, createQuestion);
 router.put("/:id", authenticate, updateQuestion);
 
 // ❗ Đặt các route cụ thể lên TRÊN
-router.get("/search", authenticate, searchQuestions);
 router.get("/my", authenticate, getMyQuestions);
-router.get("/hidden", authenticate, getHiddenQuestions);
 
 // ➜ Route mới để lấy câu hỏi theo user
 router.get("/user/:userId", authenticate, getQuestionsByUser);
@@ -33,7 +27,5 @@ router.get("/:id", getQuestionById);
 
 // router.get("/", getAllQuestions);
 router.get("/", authenticate, getAllQuestions);
-router.put("/:id/hide", authenticate, hideQuestion);
-router.put("/:id/unhide", authenticate, unhideQuestion);
 
 export default router;

@@ -41,19 +41,12 @@ const LandingPage = () => {
         <Typography variant="h5" sx={{ mt: 2 }}>
           Trường Đại học Công nghệ TP.HCM - HUTECH
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Môn học: Lập trình mạng - Giảng viên: Đàm Minh Lịnh
-        </Typography>
       </Box>
 
       {/* Mô hình 3D dấu chấm hỏi */}
       <Box sx={{ width: "100%", maxWidth: 300, mx: "auto", mb: 2 }}>
         <QuestionMark3D />
       </Box>
-      <Typography variant="caption" sx={{ color: "gray", mb: 2 }}>
-        (Nhấn vào dấu chấm hỏi để khám phá hệ thống Q&A)
-      </Typography>
-
       <Typography variant="h3" gutterBottom>
         Hệ thống Hỏi & Đáp - Q&A
       </Typography>
@@ -68,30 +61,6 @@ const LandingPage = () => {
       >
         Khám Phá
       </Button>
-
-      <Typography variant="h4" gutterBottom>
-        Nhà Phát Triển Website Q&A
-      </Typography>
-
-      <Grid container spacing={4} justifyContent="center">
-        {teamMembers.map((member, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ py: 3, px: 3 }}>
-              <CardContent>
-                <Avatar
-                  src={member.img}
-                  alt={member.name}
-                  sx={{ width: 130, height: 130, margin: "auto", mb: 2 }}
-                />
-                <Typography variant="h6" sx={{ fontSize: "1.2rem" }}>{member.name}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {member.role}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
     </Box>
   );
 };

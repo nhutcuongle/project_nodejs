@@ -7,7 +7,6 @@ import {
   User,
   ShieldCheck,
   Ban,
-  BarChart3,
   ClipboardList,
   Users,
   Tag,
@@ -101,13 +100,6 @@ function Sidebar() {
             currentPath={location.pathname}
           />
           <SidebarItem
-            to="/admin/stats"
-            icon={<BarChart3 size={20} />}
-            label="Thống kê"
-            collapsed={collapsed}
-            currentPath={location.pathname}
-          />
-          <SidebarItem
             to="/admin/questions"
             icon={<ClipboardList size={20} />}
             label="Quản lý câu hỏi"
@@ -118,13 +110,6 @@ function Sidebar() {
             to="/admin/users"
             icon={<Users size={20} />}
             label="Quản lý người dùng"
-            collapsed={collapsed}
-            currentPath={location.pathname}
-          />
-          <SidebarItem
-            to="/admin/hashtags"
-            icon={<Tag size={20} />}
-            label="Quản lý hashtag"
             collapsed={collapsed}
             currentPath={location.pathname}
           />

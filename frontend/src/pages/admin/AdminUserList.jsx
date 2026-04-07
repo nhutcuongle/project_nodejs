@@ -5,10 +5,6 @@ import {
   FaTrash,
   FaLock,
   FaUnlock,
-  FaUserShield,
-  FaBan,
-  FaQuestion,
-  FaReply,
 } from "react-icons/fa";
 
 const AdminUserList = () => {
@@ -83,18 +79,6 @@ const AdminUserList = () => {
             toast.success("Đã xoá người dùng");
           }
           break;
-        case "grant-admin":
-          res = await axiosClient.patch(`/admin/users/${userId}/set-admin`);
-          toast.success(res.data.message);
-          break;
-        case "toggle-ask":
-          res = await axiosClient.patch(`/admin/users/${userId}/toggle-ask`);
-          toast.success(res.data.message);
-          break;
-        case "toggle-answer":
-          res = await axiosClient.patch(`/admin/users/${userId}/toggle-answer`);
-          toast.success(res.data.message);
-          break;
         default:
           return;
       }
@@ -133,8 +117,6 @@ const AdminUserList = () => {
               <th className="px-4 py-3"> Email</th>
               <th className="px-4 py-3"> Mã định danh</th>
               <th className="px-4 py-3"> Vai trò</th>
-              <th className="px-4 py-3"> Quyền hỏi</th>
-              <th className="px-4 py-3"> Quyền trả lời</th>
               <th className="px-4 py-3"> Trạng thái</th>
               <th className="px-4 py-3"> Hành động</th>
             </tr>
@@ -161,20 +143,6 @@ const AdminUserList = () => {
                   )}
                 </td>
                 <td className="px-4 py-3">
-                  {user.permissions?.canAsk !== false ? (
-                    <span className="text-green-600 font-semibold">✔</span>
-                  ) : (
-                    <span className="text-red-600 font-semibold">✖</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
-                  {user.permissions?.canAnswer !== false ? (
-                    <span className="text-green-600 font-semibold">✔</span>
-                  ) : (
-                    <span className="text-red-600 font-semibold">✖</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
                   {user.isDisabled ? (
                     <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-600">
                       Vô hiệu hóa
@@ -188,26 +156,6 @@ const AdminUserList = () => {
                 <td className="px-4 py-3 flex flex-wrap gap-2">
                   {user.role !== "admin" && (
                     <>
-                      <button
-                        onClick={() => handleAction(user._id, "grant-admin")}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md text-sm bg-blue-500 text-white hover:bg-blue-600"
-                      >
-                        <FaUserShield /> Admin
-                      </button>
-                      <button
-                        onClick={() => handleAction(user._id, "toggle-ask")}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md text-sm bg-yellow-500 text-white hover:bg-yellow-600"
-                      >
-                        <FaQuestion />
-                        {user.permissions?.canAsk !== false ? "Cấm hỏi" : "Cho hỏi"}
-                      </button>
-                      <button
-                        onClick={() => handleAction(user._id, "toggle-answer")}
-                        className="flex items-center gap-1 px-3 py-1 rounded-md text-sm bg-indigo-500 text-white hover:bg-indigo-600"
-                      >
-                        <FaReply />
-                        {user.permissions?.canAnswer !== false ? "Cấm trả lời" : "Cho trả lời"}
-                      </button>
                       <button
                         onClick={() => handleAction(user._id, "toggle-disable")}
                         className="flex items-center gap-1 px-3 py-1 rounded-md text-sm bg-purple-500 text-white hover:bg-purple-600"

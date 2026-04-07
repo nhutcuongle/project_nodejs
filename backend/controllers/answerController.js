@@ -4,9 +4,6 @@ import { containsFilteredWord } from "../utils/checkFilteredWords.js";
 export const createAnswer = async (req, res) => {
   try {
     const { user, body, app } = req;
-    if (user.permissions?.canAnswer === false) {
-      return res.status(403).json({ message: "Tài khoản của bạn đã bị cấm trả lời." });
-    }
 
     let { questionId, content, images, parentAnswer } = body;
     

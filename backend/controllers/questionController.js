@@ -2,9 +2,6 @@ import * as questionService from "../services/questionService.js";
 
 export const createQuestion = async (req, res) => {
   try {
-    if (req.user.permissions?.canAsk === false) {
-      return res.status(403).json({ message: "Tài khoản của bạn đã bị cấm." });
-    }
 
     const { status, question, message } = await questionService.createQuestionLogic(
       req.body,
@@ -23,9 +20,6 @@ export const createQuestion = async (req, res) => {
 
 export const updateQuestion = async (req, res) => {
   try {
-    if (req.user.permissions?.canAsk === false) {
-      return res.status(403).json({ message: "Tài khoản của bạn đã bị cấm." });
-    }
 
     const { status, question, message } = await questionService.updateQuestionLogic(
       req.params.id,
@@ -75,57 +69,21 @@ export const getQuestionById = async (req, res) => {
   }
 };
 
-export const hideQuestion = async (req, res) => {
-  try {
-    await questionService.toggleHideQuestionLogic(req.params.id, req.user.id, true);
-    res.json({ message: "Đã ẩn." });
-  } catch (err) {
-    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Lỗi quyền." });
-    res.status(500).json({ message: "Lỗi ẩn." });
-  }
-};
-
-export const unhideQuestion = async (req, res) => {
-  try {
-    await questionService.toggleHideQuestionLogic(req.params.id, req.user.id, false);
-    res.json({ message: "Đã hiện." });
-  } catch (err) {
-    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Lỗi quyền." });
-    res.status(500).json({ message: "Lỗi hiện." });
-  }
-};
 
 export const getMyQuestions = async (req, res) => {
   try {
-    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.user.id, approved: true, isHidden: false }, req.user.id);
+    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.user.id, approved: true }, req.user.id);
     res.json(enriched);
   } catch (err) {
      res.status(500).json({ message: "Lỗi server" });
   }
 };
 
-export const getHiddenQuestions = async (req, res) => {
-  try {
-    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.user.id, isHidden: true }, req.user.id);
-    res.json(enriched);
-  } catch (err) {
-    res.status(500).json({ message: "Lỗi server" });
-  }
-};
 
-export const searchQuestions = async (req, res) => {
-  try {
-    const userId = req.user?.id || req.user?._id;
-    const questions = await questionService.searchQuestionsInDb(req.query, userId);
-    res.json({ questions });
-  } catch (err) {
-    res.status(500).json({ message: "Lỗi tìm kiếm", error: err.message });
-  }
-};
 
 export const getQuestionsByUser = async (req, res) => {
   try {
-    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.params.userId, approved: true, isHidden: false }, req.user?.id);
+    const enriched = await questionService.getQuestionsByFilterLogic({ author: req.params.userId, approved: true }, req.user?.id);
     res.json(enriched);
   } catch (error) {
     res.status(500).json({ message: "Lỗi server", error: error.message });

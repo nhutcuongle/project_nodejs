@@ -11,14 +11,12 @@ export function useChatBox(conversation, onMessageSent) {
   const { socket } = useContext(SocketContext);
 
   const [messages, setMessages] = useState([]);
-  const [pinnedMessages, setPinnedMessages] = useState([]);
   const [text, setText] = useState("");
   const [editingMessage, setEditingMessage] = useState(null);
   const [status, setStatus] = useState(conversation.status || "active");
   const [sending, setSending] = useState(false);
   const [selectedMsgId, setSelectedMsgId] = useState(null);
   const [openedMenuMsgId, setOpenedMenuMsgId] = useState(null);
-  const [showPinnedModal, setShowPinnedModal] = useState(false);
 
   const messagesRef = useRef([]);
   useEffect(() => { messagesRef.current = messages; }, [messages]);
@@ -42,7 +40,6 @@ export function useChatBox(conversation, onMessageSent) {
       const res = await messageService.getMessages(conversation._id);
       const msgs = computeTimestamps(res.messages || []);
       setMessages(msgs);
-      setPinnedMessages(msgs.filter((m) => m.isPinned));
       setStatus(res.status || "active");
       await messageService.markAsRead(conversation._id);
     };
@@ -55,24 +52,10 @@ export function useChatBox(conversation, onMessageSent) {
 
     const handleNewMessage = (data) => {
       if (data.conversationId === conversation._id) {
-        setMessages((prev) => {
-          const updated = computeTimestamps([...prev, data.message]);
-          setPinnedMessages(updated.filter((m) => m.isPinned));
-          return updated;
-        });
+        setMessages((prev) => computeTimestamps([...prev, data.message]));
       }
     };
 
-    const handlePinned = ({ messageId, isPinned }) => {
-      setMessages((prev) =>
-        prev.map((m) => (m._id === messageId ? { ...m, isPinned } : m))
-      );
-      setPinnedMessages((prev) => {
-        const msg = messagesRef.current.find((m) => m._id === messageId);
-        if (!msg) return prev;
-        return isPinned ? [msg, ...prev] : prev.filter((m) => m._id !== messageId);
-      });
-    };
 
     const handleEdited = ({ messageId, newText }) => {
       setMessages((prev) =>
@@ -91,13 +74,11 @@ export function useChatBox(conversation, onMessageSent) {
     };
 
     socket.on("new_message", handleNewMessage);
-    socket.on("message_pinned", handlePinned);
     socket.on("message_edited", handleEdited);
     socket.on("message_recalled", handleRecalled);
 
     return () => {
       socket.off("new_message", handleNewMessage);
-      socket.off("message_pinned", handlePinned);
       socket.off("message_edited", handleEdited);
       socket.off("message_recalled", handleRecalled);
     };
@@ -132,24 +113,8 @@ export function useChatBox(conversation, onMessageSent) {
     } catch (err) { console.error(err); }
   };
 
-  const handleMessageAction = async ({ edit, togglePin, message, recallForAll, deleteForMe }) => {
+  const handleMessageAction = async ({ edit, message, recallForAll, deleteForMe }) => {
     if (edit) { setEditingMessage(message); setText(message.text); return; }
-    if (togglePin) {
-      try {
-        const res = await messageService.togglePin(message._id);
-        setMessages((prev) =>
-          prev.map((m) =>
-            m._id === res.message._id ? { ...m, isPinned: res.message.isPinned } : m
-          )
-        );
-        setPinnedMessages((prev) => {
-          return res.message.isPinned
-            ? [res.message, ...prev.filter((m) => m._id !== res.message._id)]
-            : prev.filter((m) => m._id !== res.message._id);
-        });
-      } catch (err) { console.error(err); }
-      return;
-    }
     try {
       if (recallForAll) { await messageService.recallMessage(message._id); setMessages(prev => prev.map(m => m._id === message._id ? { ...m, isRecalled: true } : m)); }
       if (deleteForMe) { await messageService.deleteMessageLocal(message._id); setMessages(prev => prev.filter(m => m._id !== message._id)); }
@@ -196,14 +161,12 @@ export function useChatBox(conversation, onMessageSent) {
 
   return {
     messages, setMessages,
-    pinnedMessages, setPinnedMessages,
     text, setText,
     editingMessage, setEditingMessage,
     status, setStatus,
     sending,
     selectedMsgId, setSelectedMsgId,
     openedMenuMsgId, setOpenedMenuMsgId,
-    showPinnedModal, setShowPinnedModal,
     other, isRecipient,
     scrollToMessage,
     handleEditSubmit,

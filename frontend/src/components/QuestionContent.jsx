@@ -2,7 +2,6 @@ import React, { useRef } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/vi";
-import { BsBookmark, BsBookmarkFill } from "react-icons/bs";
 import useClickOutside from "../hooks/useClickOutside";
 import { Link } from "react-router-dom";
 import AnswerForm from "./AnswerForm";
@@ -16,8 +15,6 @@ const QuestionContent = ({
   handleVote,
   userVote,
   token,
-  handleSave,
-  handleUnsave,
   showAnswerForm,
   setShowAnswerForm,
   newAnswer, // 👈 thêm
@@ -51,24 +48,6 @@ const QuestionContent = ({
           </p>
         </div>
 
-        {/* Bookmark */}
-        {token && (
-          <button
-            onClick={() =>
-              question.savedByUser
-                ? handleUnsave(question._id)
-                : handleSave(question._id)
-            }
-            className="ml-auto p-2 rounded-full hover:bg-gray-100"
-            title={question.savedByUser ? "Bỏ lưu" : "Lưu câu hỏi"}
-          >
-            {question.savedByUser ? (
-              <BsBookmarkFill className="text-yellow-500" />
-            ) : (
-              <BsBookmark className="text-gray-500" />
-            )}
-          </button>
-        )}
       </div>
 
       {/* Tiêu đề + nội dung */}
@@ -128,22 +107,6 @@ const QuestionContent = ({
         </div>
       )}
 
-      {/* Hashtags */}
-      {question.hashtags?.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-3">
-          {question.hashtags.map((tag, index) => {
-            const key = tag?._id || `${tag?.name || "tag"}-${index}`;
-            return (
-              <span
-                key={key}
-                className="px-2 py-1 text-sm bg-gray-200 text-gray-800 rounded-full"
-              >
-                {tag?.name || "hashtag"}
-              </span>
-            );
-          })}
-        </div>
-      )}
 
       {/* Vote + Trả lời */}
       <div className="flex items-center mt-4 space-x-4">

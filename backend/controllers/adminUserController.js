@@ -29,30 +29,4 @@ export const deleteUser = async (req, res) => {
   }
 };
 
-export const setAdminRole = async (req, res) => {
-  try {
-    const user = await adminUserService.setAdminRoleLogic(req.params.id);
-    res.json({ message: "Đã cấp quyền admin.", user });
-  } catch (err) {
-    if (err.message === "ALREADY_ADMIN") return res.status(400).json({ message: "Đã là admin." });
-    res.status(500).json({ message: "Lỗi quyền admin.", error: err.message });
-  }
-};
 
-export const toggleCanAsk = async (req, res) => {
-  try {
-    const user = await adminUserService.togglePermissionLogic(req.params.id, "canAsk");
-    res.json({ message: `Đã ${user.permissions.canAsk ? "mở" : "cấm"} quyền hỏi.`, user });
-  } catch (err) {
-    res.status(500).json({ message: "Lỗi quyền hỏi." });
-  }
-};
-
-export const toggleCanAnswer = async (req, res) => {
-  try {
-    const user = await adminUserService.togglePermissionLogic(req.params.id, "canAnswer");
-    res.json({ message: `Đã ${user.permissions.canAnswer ? "mở" : "cấm"} quyền trả lời.`, user });
-  } catch (err) {
-    res.status(500).json({ message: "Lỗi quyền trả lời." });
-  }
-};

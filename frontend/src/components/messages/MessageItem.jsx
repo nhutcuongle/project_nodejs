@@ -84,7 +84,6 @@ export default function MessageItem({
               : "bg-gray-200 text-gray-900 rounded-bl-none"
           }
           ${message.isRecalled ? "italic text-gray-500 bg-gray-200" : ""}
-          ${message.isPinned ? "border-2 border-yellow-400" : ""}
         `}
       >
         {displayText}
@@ -109,7 +108,6 @@ export default function MessageItem({
           <MessageMenu
             isMine={isMine}
             isRecalled={message.isRecalled}
-            message={message}
             onUnsend={() => setConfirmRecall(true)}
             onEdit={() => {
               setOpenedMenuMsgId(null);
@@ -117,7 +115,6 @@ export default function MessageItem({
             }}
             onRemoveForMe={() => handleRecallSubmit({ deleteForMe: true })}
             onReport={() => console.log("Report")}
-            onPin={() => onAction?.({ message, togglePin: true })}
             placement={menuPlacement}
             alignRight={isMine}
           />

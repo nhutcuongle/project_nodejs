@@ -1,5 +1,4 @@
 import * as videoRepository from "../repositories/videoRepository.js";
-import Notification from "../models/Notification.js";
 import User from "../models/User.js";
 
 export const createVideo = async (userId, description, filePath) => {
@@ -27,22 +26,7 @@ export const toggleLikeVideoLogic = async (videoId, userId, io) => {
     video.likes.pull(userId);
   } else {
     video.likes.push(userId);
-    // Notification logic stays in Service Layer (Business Logic)
-    if (video.user._id.toString() !== userIdStr) {
-      const notif = await Notification.create({
-        user: video.user._id,
-        message: `${liker.identifier} đã thích video của bạn.`,
-        link: `/video/${video._id}`,
-      });
-      if (io) {
-        io.to(video.user._id.toString()).emit("video_liked", {
-          message: notif.message,
-          link: notif.link,
-          createdAt: notif.createdAt,
-          read: false,
-        });
-      }
-    }
+    // Notification logic removed
   }
 
   // Use repository to save the document
@@ -70,28 +54,15 @@ export const deleteVideoFromCloudinary = async (url) => {
 export const deleteVideoLogic = async (videoId, userId) => {
   const video = await videoRepository.findById(videoId);
   if (!video) throw new Error("NOT_FOUND");
-  if (video.user.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
+  
+  // video.user is populated as an object, so we need to access its ._id
+  if (video.user._id.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
 
   await deleteVideoFromCloudinary(video.videoUrl);
   await video.deleteOne();
   return { success: true, message: "Đã xóa." };
 };
 
-/**
- * Logic for updating a video's details (e.g. description).
- */
-export const updateVideoLogic = async (videoId, userId, description) => {
-  const video = await videoRepository.findById(videoId);
-  if (!video) throw new Error("NOT_FOUND");
-  if (video.user.toString() !== userId.toString()) throw new Error("UNAUTHORIZED");
-
-  if (description !== undefined) {
-    video.description = description;
-  }
-
-  await videoRepository.save(video);
-  return video;
-};
 
 export const getVideoByIdLogic = async (videoId) => {
   const video = await videoRepository.findById(videoId, "user");

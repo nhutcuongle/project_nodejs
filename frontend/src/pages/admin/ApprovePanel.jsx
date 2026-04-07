@@ -108,7 +108,6 @@ const ApprovePanel = () => {
                 <thead className="bg-blue-50 text-gray-700">
                   <tr>
                     <th className="px-4 py-3">🧠 Tiêu đề</th>
-                    <th className="px-4 py-3">🏷️ Hashtag</th>
                     <th className="px-4 py-3">📄 Nội dung</th>
                     <th className="px-4 py-3">👤 Người đăng</th>
                     <th className="px-4 py-3">⚙️ Hành động</th>
@@ -124,18 +123,6 @@ const ApprovePanel = () => {
                     >
                       <td className="px-4 py-3 text-indigo-700 font-medium">
                         {q.title}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1">
-                          {q.hashtags?.map((tag) => (
-                            <span
-                              key={tag._id}
-                              className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full text-xs"
-                            >
-                              {tag.name}
-                            </span>
-                          ))}
-                        </div>
                       </td>
                       <td className="px-4 py-3">{q.content}</td>
                       <td className="px-4 py-3">

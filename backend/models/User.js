@@ -19,11 +19,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
-
-    permissions: {
-      canAsk: { type: Boolean, default: true },
-      canAnswer: { type: Boolean, default: true },
-    },  },
+  },
   { timestamps: true }
 );
 

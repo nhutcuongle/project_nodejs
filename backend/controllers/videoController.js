@@ -49,17 +49,6 @@ export const deleteVideo = async (req, res) => {
   }
 };
 
-export const updateVideo = async (req, res) => {
-  try {
-    const { description } = req.body;
-    const video = await videoService.updateVideoLogic(req.params.id, req.user.id, description);
-    res.json({ success: true, video });
-  } catch (err) {
-    if (err.message === "NOT_FOUND") return res.status(404).json({ message: "Không tìm thấy video." });
-    if (err.message === "UNAUTHORIZED") return res.status(403).json({ message: "Không có quyền sửa video này." });
-    res.status(500).json({ message: "Lỗi cập nhật.", error: err.message });
-  }
-};
 
 export const getVideoById = async (req, res) => {
   try {

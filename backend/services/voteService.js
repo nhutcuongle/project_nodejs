@@ -1,7 +1,6 @@
 import Vote from "../models/Vote.js";
 import Question from "../models/Question.js";
 import Answer from "../models/Answer.js";
-import * as notificationService from "./notificationService.js";
 
 /**
  * Gets vote counts for a target.
@@ -70,32 +69,6 @@ export const handleVote = async (userId, username, targetId, targetType, voteTyp
 
   const { upvotes, downvotes } = await getVoteCounts(targetId, targetType);
 
-  // Send notification if action was not 'removed'
-  if (action !== "removed") {
-    let targetOwner = null;
-    let message = "";
-    let link = "";
-
-    if (targetType === "question") {
-      const question = await Question.findById(targetId).populate("author", "_id username title");
-      if (question) {
-        targetOwner = question.author?._id;
-        message = `${username || "Một người dùng"} đã ${voteType === "up" ? "thích" : "ghét"} câu hỏi của bạn: "${question.title}"`;
-        link = `/questions/${question._id}`;
-      }
-    } else if (targetType === "answer") {
-      const answer = await Answer.findById(targetId).populate("author", "_id username question");
-      if (answer) {
-        targetOwner = answer.author?._id;
-        message = `${username || "Một người dùng"} đã ${voteType === "up" ? "upvote" : "downvote"} câu trả lời của bạn.`;
-        link = `/questions/${answer.question}`;
-      }
-    }
-
-    if (targetOwner && targetOwner.toString() !== userId.toString()) {
-      await notificationService.sendVoteNotification(targetOwner, message, link, io);
-    }
-  }
 
   return { upvotes, downvotes, action };
 };

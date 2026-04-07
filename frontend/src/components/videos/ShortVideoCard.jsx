@@ -267,7 +267,7 @@ export default function ShortVideoCard({
                 <Copy size={18} /> Sao chép liên kết
               </button>
 
-              {user && video.user && video.user._id === user._id && (
+              {user && video.user && (video.user._id?.toString() === user._id?.toString()) && (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
                   className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-red-600"

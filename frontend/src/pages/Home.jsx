@@ -1,7 +1,6 @@
   import React, { useEffect, useState } from "react";
   import QuestionList from "../components/QuestionList";
   import { useAuth } from "../context/AuthContext"; // ✅ Import useAuth
-  import SearchBar from "../components/SearchBar";
 
   function Home() {
     const [questions, setQuestions] = useState([]);
@@ -54,9 +53,6 @@
           Chào mừng đến với nền tảng hỏi & đáp thời gian thực. Bạn có thể đặt câu
           hỏi, trả lời, bình chọn và nhận thông báo ngay lập tức.
         </p>
-        <div className="mt-6">
-          <SearchBar />
-        </div>
         
 
         {/* ✅ Truyền danh sách câu hỏi và hàm fetchQuestions */}

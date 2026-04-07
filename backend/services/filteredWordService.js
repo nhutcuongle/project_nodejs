@@ -15,7 +15,7 @@ export const getFilteredWordsLogic = async (type) => {
  * Adds a new filtered word.
  */
 export const addFilteredWordLogic = async (data, addedBy) => {
-  const { word, type = "text", severity = "medium", category = "general", action = "pending" } = data;
+  const { word, type = "text", action = "pending" } = data;
   if (!word) throw new Error("WORD_MISSING");
 
   const normalizedWord = word.toLowerCase().trim();
@@ -25,8 +25,6 @@ export const addFilteredWordLogic = async (data, addedBy) => {
   const newWord = await FilteredWord.create({
     word: normalizedWord,
     type,
-    severity,
-    category,
     action,
     addedBy,
   });

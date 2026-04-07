@@ -5,8 +5,6 @@ export default function MessageMenu({
   onEdit,
   onRemoveForMe,
   onReport,
-  onPin,        // ⭐ thêm prop
-  message,      // ⭐ thêm prop
   placement = "down",
   alignRight = false,
 }) {
@@ -36,12 +34,6 @@ export default function MessageMenu({
             onClick={onEdit}
           >
             Chỉnh sửa
-          </div>
-          <div
-            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-            onClick={onPin} // ✅ giờ đã có prop
-          >
-            {message?.isPinned ? "Bỏ ghim" : "Ghim"}
           </div>
         </>
       )}

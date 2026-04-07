@@ -1,6 +1,5 @@
 import Follow from "../models/Follow.js";
 import User from "../models/User.js";
-import * as notificationService from "./notificationService.js";
 
 /**
  * Follow a user and send notification.
@@ -15,32 +14,6 @@ export const followUser = async (followerId, followingId, io) => {
 
   await Follow.create({ follower: followerId, following: followingId });
 
-  const [follower, isFollowedBy] = await Promise.all([
-    User.findById(followerId).select("_id username identifier"),
-    Follow.findOne({ follower: followingId, following: followerId })
-  ]);
-
-  const type = isFollowedBy ? "friend" : "follow";
-  const msg = isFollowedBy
-    ? `${follower.username} đã theo dõi bạn, từ nay các bạn là bạn bè`
-    : `${follower.username} đã theo dõi bạn`;
-
-  if (io) {
-    io.to(followingId.toString()).emit("follow_notification", {
-      sender: {
-        _id: follower._id,
-        username: follower.username,
-        identifier: follower.identifier,
-      },
-      type,
-    });
-  }
-
-  await notificationService.sendGenericNotification(
-    followingId,
-    msg,
-    `/profile/${follower._id}`
-  );
 
   return true;
 };
@@ -52,25 +25,6 @@ export const unfollowUser = async (followerId, followingId, io) => {
   const deleted = await Follow.findOneAndDelete({ follower: followerId, following: followingId });
   if (!deleted) throw new Error("Bạn chưa theo dõi người này");
 
-  const follower = await User.findById(followerId).select("_id username identifier");
-
-  if (io) {
-    io.to(followingId.toString()).emit("follow_notification", {
-      sender: {
-        _id: follower._id,
-        username: follower.username,
-        identifier: follower.identifier,
-      },
-      type: "unfollow",
-    });
-  }
-
-  const msg = `${follower.username} đã hủy theo dõi bạn`;
-  await notificationService.sendGenericNotification(
-    followingId,
-    msg,
-    `/profile/${follower._id}`
-  );
 
   return true;
 };

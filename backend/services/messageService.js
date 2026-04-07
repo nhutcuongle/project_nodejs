@@ -134,19 +134,3 @@ export const deleteMessageLocalLogic = async (messageId, userId) => {
   return { success: true };
 };
 
-export const togglePinMessageLogic = async (messageId, userId, io) => {
-  const message = await Message.findById(messageId);
-  if (!message) throw new Error("NOT_FOUND");
-  const conversation = await Conversation.findById(message.conversation);
-  if (!conversation.participants.some(p => p.toString() === userId))
-    throw new Error("UNAUTHORIZED");
-
-  message.isPinned = !message.isPinned;
-  await message.save();
-  if (io) {
-    io.to(message.conversation.toString()).emit("message_pinned", { 
-      messageId: message._id, isPinned: message.isPinned 
-    });
-  }
-  return { success: true, message };
-};

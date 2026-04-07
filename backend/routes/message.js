@@ -6,7 +6,6 @@ import {
   recallMessage,
   deleteMessageLocal,
   editMessage,
-  togglePinMessage,
 } from "../controllers/messageController.js";
 import { authenticate } from "../middlewares/authMiddleware.js";
 
@@ -18,6 +17,5 @@ router.post("/:conversationId/read", authenticate, markAsRead);
 router.post("/:id/recall", authenticate, recallMessage);
 router.post("/:id/delete", authenticate, deleteMessageLocal);
 router.put("/:id", authenticate, editMessage);
-router.put("/:id/pin", authenticate, togglePinMessage);
 
 export default router;

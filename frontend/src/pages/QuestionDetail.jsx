@@ -198,25 +198,6 @@ const handleReplySubmit = async (e, parentId = null) => {
     }
   };
 
-  const handleSave = async (questionId) => {
-    try {
-      await axios.post(`/questions/${questionId}/save`);
-      setQuestion((prev) => ({ ...prev, savedByUser: true }));
-      toast.success("Đã lưu câu hỏi");
-    } catch (err) {
-      toast.error("Lỗi khi lưu câu hỏi");
-    }
-  };
-
-  const handleUnsave = async (questionId) => {
-    try {
-      await axios.post(`/questions/${questionId}/unsave`);
-      setQuestion((prev) => ({ ...prev, savedByUser: false }));
-      toast.success("Đã bỏ lưu câu hỏi");
-    } catch (err) {
-      toast.error("Lỗi khi bỏ lưu câu hỏi");
-    }
-  };
 
   if (!question) return <p className="p-4">Đang tải câu hỏi...</p>;
 
@@ -236,8 +217,6 @@ const handleReplySubmit = async (e, parentId = null) => {
         handleVote={handleVote}
         userVote={question.userVote}
         token={token}
-        handleSave={handleSave}
-        handleUnsave={handleUnsave}
         showAnswerForm={showAnswerForm}
         setShowAnswerForm={setShowAnswerForm}
         newAnswer={newAnswer}

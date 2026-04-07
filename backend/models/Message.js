@@ -11,7 +11,6 @@ const MessageSchema = new mongoose.Schema({
   isRecalled: { type: Boolean, default: false },   // Thu hồi mọi người
   deletedFor: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // xóa phía bạn
   edited: { type: Boolean, default: false },
-  isPinned: { type: Boolean, default: false }
 });
 
 export default mongoose.model("Message", MessageSchema);

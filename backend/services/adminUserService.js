@@ -45,34 +45,7 @@ export const toggleDisableUserLogic = async (userId) => {
   return user;
 };
 
-/**
- * Sets a user as admin and restores permissions.
- */
-export const setAdminRoleLogic = async (userId) => {
-  const user = await User.findById(userId);
-  if (!user) throw new Error("USER_NOT_FOUND");
-  if (user.role === "admin") throw new Error("ALREADY_ADMIN");
 
-  user.role = "admin";
-  user.permissions = { canAsk: true, canAnswer: true };
-  user.isDisabled = false;
-  await user.save();
-  return user;
-};
-
-/**
- * Toggles specific permission for a user.
- */
-export const togglePermissionLogic = async (userId, permKey) => {
-  const user = await User.findById(userId);
-  if (!user) throw new Error("USER_NOT_FOUND");
-  if (user.role === "admin") throw new Error("CANNOT_MODIFY_ADMIN");
-
-  if (!user.permissions) user.permissions = {};
-  user.permissions[permKey] = !user.permissions[permKey];
-  await user.save();
-  return user;
-};
 
 export const deleteUserLogic = async (userId) => {
   const isAdmin = await isTargetAdmin(userId);

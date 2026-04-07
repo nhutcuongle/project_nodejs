@@ -62,11 +62,3 @@ export const deleteMessageLocal = async (req, res) => {
   }
 };
 
-export const togglePinMessage = async (req, res) => {
-  try {
-    const result = await messageService.togglePinMessageLogic(req.params.id, req.user.id, req.app.get("io"));
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ message: "Lỗi ghim." });
-  }
-};

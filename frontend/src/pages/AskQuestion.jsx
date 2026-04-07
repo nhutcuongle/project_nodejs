@@ -15,9 +15,6 @@ function AskQuestion() {
   const [violationMessage, setViolationMessage] = useState("");
   const [pendingQuestion, setPendingQuestion] = useState(null);
 
-  // Hashtag logic
-  const [hashtags, setHashtags] = useState([]);
-  const [hashtagInput, setHashtagInput] = useState("");
 
   if (!isAuthenticated) {
     navigate("/login");
@@ -62,20 +59,6 @@ function AskQuestion() {
     return urls;
   };
 
-  const handleAddHashtag = (e) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      const tag = hashtagInput.trim().replace(/^#/, "").toLowerCase();
-      if (tag && !hashtags.includes(tag)) {
-        setHashtags([...hashtags, tag]);
-      }
-      setHashtagInput("");
-    }
-  };
-
-  const handleRemoveHashtag = (index) => {
-    setHashtags((prev) => prev.filter((_, i) => i !== index));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,7 +79,6 @@ function AskQuestion() {
           title,
           content,
           images: imageUrls,
-          hashtags,
         }),
       });
 
@@ -113,7 +95,6 @@ function AskQuestion() {
           title,
           content,
           images: imageUrls,
-          hashtags,
         });
       } else {
         toast.error(data.message || "Lỗi khi gửi câu hỏi.");
@@ -166,37 +147,6 @@ function AskQuestion() {
           required
         />
 
-        {/* Hashtag input */}
-        <div>
-          <label className="block mb-1 text-sm font-medium text-gray-700">
-            Hashtags
-          </label>
-          <div className="flex flex-wrap gap-2 mb-2">
-            {hashtags.map((tag, index) => (
-              <span
-                key={index}
-                className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center"
-              >
-                #{tag}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveHashtag(index)}
-                  className="ml-1 text-xs text-red-500 hover:text-red-700"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-          </div>
-          <input
-            type="text"
-            placeholder="Nhập hashtag và nhấn Enter"
-            className="w-full border p-2 rounded"
-            value={hashtagInput}
-            onChange={(e) => setHashtagInput(e.target.value)}
-            onKeyDown={handleAddHashtag}
-          />
-        </div>
 
         <textarea
           placeholder="Nội dung chi tiết"

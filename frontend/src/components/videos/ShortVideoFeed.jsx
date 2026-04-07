@@ -53,6 +53,13 @@ export default function ShortVideoFeed() {
 
   const handleNext = () => scrollToVideo(currentIndex + 1);
   const handlePrev = () => scrollToVideo(currentIndex - 1);
+  
+  const handleVideoDeleted = (deletedId) => {
+    setVideos(prev => prev.filter(v => v._id !== deletedId));
+    if (currentIndex >= videos.length - 1 && currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    }
+  };
 
   // ✅ Cuộn bằng chuột
   useEffect(() => {
@@ -99,6 +106,7 @@ export default function ShortVideoFeed() {
                   muted={muted}
                   setMuted={setMuted}
                   onShowComments={setShowComments}
+                  onDeleted={handleVideoDeleted}
                 />
               </div>
             ))}
